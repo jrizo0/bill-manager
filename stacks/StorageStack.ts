@@ -1,20 +1,30 @@
 import { Bucket, StackContext, Table } from "sst/constructs";
 
 export function StorageStack({ stack, app }: StackContext) {
-  // Create the DynamoDB table
   const tableBills = new Table(stack, "Bills", {
     fields: {
-      userId: "string",
-      billId: "string",
+      userID: "string",
+      billID: "string",
       tag: "string",
       paymentWeb: "string",
-      paymentDay: "number",
-      paymentReference: "string"
+      expirationDay: "number",
+      reference: "string",
+      created: "string",
     },
-    primaryIndex: { partitionKey: "userId", sortKey: "billId" },
+    primaryIndex: { partitionKey: "userID", sortKey: "billID" },
   });
 
-  //TODO: enhancement uploads
+  const tablePayments = new Table(stack, "Payments", {
+    fields: {
+      billID: "string",
+      month: "number",
+      year: "number",
+      created: "string",
+    },
+    primaryIndex: { partitionKey: "billID", sortKey: "month" },
+  })
+
+  //TODO: enhancement uploads:
   // const bucket = new Bucket(stack, "Uploads", {
   //   cors: [
   //     {
@@ -27,7 +37,7 @@ export function StorageStack({ stack, app }: StackContext) {
   // });
 
   return {
-    billsTable: tableBills,
+    tableBills: tableBills,
+    tablePayments: tablePayments,
   };
 }
-

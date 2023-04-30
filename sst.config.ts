@@ -8,8 +8,11 @@ export default {
       name: "bill-manager",
       region: "us-east-1",
     };
+
   },
   stacks(app) {
+    if (!["prod", "stage"].includes(app.stage))
+      app.setDefaultRemovalPolicy("destroy")
     app.stack(StorageStack);
     app.stack(ApiStack);
   }

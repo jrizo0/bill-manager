@@ -1,23 +1,15 @@
-import { Table } from "sst/node/table";
-import handler from "@bill-manager/core/handler";
-import dynamoDb from "@bill-manager/core/dynamodb";
+import { Bill } from "@bill-manager/core/bill";
+import handler from "src/handler";
 
 export const main = handler(async (event: any) => {
   const params = {
-    TableName: Table.Bills.tableName,
-    // 'Key' defines the partition key and sort key of the item to be retrieved
-    Key: {
-      // userId: event.requestContext.authorizer.iam.cognitoIdentity.identityId, // The id of the author
-      userId: "1",
-      billId: event.pathParameters.id, // The id of the note from the path
-    },
-  };
+    userID: "1",
+    billID: event.pathParameters.id
+  }
+  const result = await Bill.get(params)
 
-  const result = await dynamoDb.get(params);
-  if (!result.Item) {
+  if (!result) {
     throw new Error("Item not found.");
   }
-
-  // Return the retrieved item
-  return result.Item;
+  return result
 });

@@ -1,19 +1,13 @@
-import { Table } from "sst/node/table";
-import handler from "@bill-manager/core/handler";
-import dynamoDb from "@bill-manager/core/dynamodb";
+import { Bill } from "@bill-manager/core/bill";
+import handler from "src/handler";
 
 export const main = handler(async (event: any) => {
   const params = {
-    TableName: Table.Bills.tableName,
-    // 'Key' defines the partition key and sort key of the item to be removed
-    Key: {
-      // userId: event.requestContext.authorizer.iam.cognitoIdentity.identityId, // The id of the author
-      userId: "1",
-      billId: event.pathParameters.id, // The id of the note from the path
-    },
-  };
+    userID: "1",
+    billID: event.pathParameters.id
+  }
 
-  await dynamoDb.delete(params);
+  const result = await Bill.remove(params)
 
-  return { status: true };
+  return result
 });
