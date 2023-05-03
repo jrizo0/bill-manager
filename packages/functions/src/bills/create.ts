@@ -7,7 +7,7 @@ export const main = handler(async (event: any) => {
   const params = {
     tag: data.tag,
     paymentWeb: data.paymentWeb,
-    expirationDay: data.expirationDay,
+    expirationDay: Number(data.expirationDay),
     reference: data.reference,
   }
   const result = await Bill.create(params)

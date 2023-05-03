@@ -10,7 +10,7 @@ export interface Info {
   billID: string
   tag: string
   paymentWeb: string
-  expirationDay: string
+  expirationDay: number
   reference: string
   times: {
     created: Date
@@ -21,7 +21,7 @@ export interface Info {
 export async function create(_input: {
   tag: string
   paymentWeb: string
-  expirationDay: string
+  expirationDay: number
   reference: string
 }) {
   const params = {

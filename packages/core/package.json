@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.15.13",
+    "@types/uuid": "^9.0.1",
     "sst": "^2.5.8",
     "vitest": "^0.30.1"
   },
