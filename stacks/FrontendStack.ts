@@ -7,7 +7,7 @@ export function FrontendStack({ stack, app }: StackContext) {
   // Define our React app 
   const site = new NextjsSite(stack, "Site", {
     path: "packages/web",
-    buildCommand: "npm run build",
+    buildCommand: "pnpm build",
     environment: {
       NEXT_PUBLIC_API_URL: api.customDomainUrl || api.url,
       NEXT_PUBLIC_REGION: app.region,
