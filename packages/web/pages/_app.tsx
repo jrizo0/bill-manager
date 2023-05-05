@@ -1,32 +1,32 @@
-import { onError } from '@/lib/errorLib';
-import '@/styles/globals.css';
-import { Amplify, Auth } from 'aws-amplify';
-import "bootstrap/dist/css/bootstrap.min.css";
-import type { AppProps } from 'next/app';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { Button, Navbar } from 'react-bootstrap';
-import config from '../config';
-import "../styles/Home.css";
-import AppBar from '@/components/AppBar';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-import Layout from '@/components/Layout';
+import { onError } from '@/lib/errorLib'
+import '@/styles/globals.css'
+import { Amplify, Auth } from 'aws-amplify'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import type { AppProps } from 'next/app'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Button, Navbar } from 'react-bootstrap'
+import config from '../config'
+import '../styles/Home.css'
+import AppBar from '@/components/AppBar'
+import '@fontsource/roboto/300.css'
+import '@fontsource/roboto/400.css'
+import '@fontsource/roboto/500.css'
+import '@fontsource/roboto/700.css'
+import Layout from '@/components/Layout'
 
 export default function App({ Component, pageProps }: AppProps) {
   Amplify.configure({
     API: {
       endpoints: [
         {
-          name: "bills",
+          name: 'bills',
           endpoint: config.apiGateway.URL,
-          region: config.apiGateway.REGION
+          region: config.apiGateway.REGION,
         },
-      ]
-    }
-  });
+      ],
+    },
+  })
 
   /* EJEMPLO NOTES CON AUTH
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -59,19 +59,14 @@ export default function App({ Component, pageProps }: AppProps) {
 
   */
 
-
-
   return (
     // <Layout>
     //   <Component {...pageProps} />
     // </Layout>
 
-    <div className="App container py-3">
+    <div className='App container py-3'>
       <AppBar />
       <Component {...pageProps} />
     </div>
-
   )
-
-
 }

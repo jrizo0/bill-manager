@@ -2,9 +2,9 @@
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
   "/404": "pages/404.html",
-  "/_error": "pages/_error.js",
   "/500": "pages/500.html",
   "/api/hello": "pages/api/hello.js",
   "/bills/new": "pages/bills/new.html",
-  "/": "pages/index.js"
+  "/_error": "pages/_error.js",
+  "/": "pages/index.html"
 }
