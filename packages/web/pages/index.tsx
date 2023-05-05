@@ -3,8 +3,8 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import Typography from "@mui/material/Typography";
 import { API } from "aws-amplify";
-import { GetServerSideProps, NextPage } from "next";
-import { useState } from "react";
+import { NextPage } from "next";
+import { useEffect, useState } from "react";
 import ListGroup from "react-bootstrap/ListGroup";
 import { BsPencilSquare } from "react-icons/bs";
 import { onError } from "../lib/errorLib";
@@ -12,6 +12,25 @@ import { onError } from "../lib/errorLib";
 const Home: NextPage<any> = ({ data }) => {
   const [bills, setBills] = useState<any>(data);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    async function onLoad() {
+      try {
+        const notes = await loadBills();
+        setBills(notes);
+        console.log(notes)
+      } catch (e) {
+        onError(e);
+      }
+      setIsLoading(false);
+    }
+
+    onLoad();
+  });
+
+  function loadBills() {
+    return API.get("bills", "/bills", {});
+  }
 
 
   async function handlePayBill(_id: any) {
@@ -100,15 +119,15 @@ const Home: NextPage<any> = ({ data }) => {
 
 }
 
-export const getServerSideProps: GetServerSideProps<any> = async () => {
-  try {
-    const data = await API.get("bills", "/bills", {});
-    return { props: { data } }
-  } catch (e) {
-    onError(e);
-    return { props: [] }
-  }
-}
+// export const getServerSideProps: GetServerSideProps<any> = async () => {
+//   try {
+//     const data = await API.get("bills", "/bills", {});
+//     return { props: { data } }
+//   } catch (e) {
+//     onError(e);
+//     return { props: [] }
+//   }
+// }
 
 export default Home;
 
