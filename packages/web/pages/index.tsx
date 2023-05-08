@@ -16,9 +16,9 @@ const Home: NextPage<any> = ({ data }) => {
   useEffect(() => {
     async function onLoad() {
       try {
-        const notes = await loadBills()
-        setBills(notes)
-        console.log(notes)
+        const bills = await loadBills()
+        setBills(bills)
+        console.log(bills)
       } catch (e) {
         onError(e)
       }
@@ -26,7 +26,7 @@ const Home: NextPage<any> = ({ data }) => {
     }
 
     onLoad()
-  })
+  }, [])
 
   function loadBills() {
     return API.get('bills', '/bills', {})
@@ -98,10 +98,10 @@ const Home: NextPage<any> = ({ data }) => {
     )
   }
 
-  function renderNotes() {
+  function renderBills() {
     return (
       // <ListGroup>{!isLoading && renderBillsList(bills)}</ListGroup>
-      <div className='notes'>
+      <div className='bills'>
         <Typography variant='h5' component='div' sx={{ mt: 4, mx: 2 }}>
           Your bills
         </Typography>
@@ -114,8 +114,8 @@ const Home: NextPage<any> = ({ data }) => {
   return (
     <>
       <div className='Home'>
-        {/* isAuthenticated ? renderNotes() : renderLander() */}
-        {renderNotes()}
+        {/* isAuthenticated ? renderBills() : renderLander() */}
+        {renderBills()}
         {/* renderLander() */}
       </div>
     </>
@@ -133,24 +133,3 @@ const Home: NextPage<any> = ({ data }) => {
 // }
 
 export default Home
-
-/*
-useEffect(() => {
-  async function onLoad() {
-    try {
-      const notes = await loadBills();
-      setBills(notes);
-      console.log(notes)
-    } catch (e) {
-      onError(e);
-    }
-    setIsLoading(false);
-  }
-
-  onLoad();
-});
-
-function loadBills() {
-  return API.get("bills", "/bills", {});
-}
-*/
