@@ -1,11 +1,10 @@
 import React from 'react'
-import AppBar from './AppBar'
+import { Box } from '@mui/material'
 
 function Layout({ children }: any) {
   return (
     <>
-      <AppBar />
-      <div className='App container py-3'>{children}</div>
+      <Box sx={{ py: 3, maxWidth: "80%", margin: "auto" }} >{children}</Box>
     </>
   )
 }

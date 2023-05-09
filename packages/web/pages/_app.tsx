@@ -1,11 +1,9 @@
 import { onError } from '@/lib/errorLib'
 import '@/styles/globals.css'
 import { Amplify, Auth } from 'aws-amplify'
-import 'bootstrap/dist/css/bootstrap.min.css'
 import type { AppProps } from 'next/app'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button, Navbar } from 'react-bootstrap'
 import config from '../config'
 import '../styles/Home.css'
 import AppBar from '@/components/AppBar'
@@ -60,13 +58,14 @@ export default function App({ Component, pageProps }: AppProps) {
   */
 
   return (
-    // <Layout>
-    //   <Component {...pageProps} />
-    // </Layout>
-
-    <div className='App container py-3'>
+    <Layout>
       <AppBar />
       <Component {...pageProps} />
-    </div>
+    </Layout>
+
+    // <div className='App container py-3'>
+    //   <AppBar />
+    //   <Component {...pageProps} />
+    // </div>
   )
 }
