@@ -5,9 +5,9 @@ import Typography from '@mui/material/Typography'
 import { API } from 'aws-amplify'
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
-import ListGroup from 'react-bootstrap/ListGroup'
 import { BsPencilSquare } from 'react-icons/bs'
 import { onError } from '../lib/errorLib'
+import Box from '@mui/material/Box'
 
 const Home: NextPage<any> = ({ data }) => {
   const [bills, setBills] = useState<any>(data)
@@ -68,11 +68,11 @@ const Home: NextPage<any> = ({ data }) => {
         <List>
           <ListItemButton
             divider={true}
-            href='/bills/new'
+            href='/bills/naw'
             sx={{ py: 3, borderRadius: '10px' }}
           >
             <BsPencilSquare size={17} />
-            <span className='ms-2 fw-bold'>Create a new bill</span>
+            <Box mx={{ marginInlineStart: 4, fontWeight: "bold" }} >Create a new bill</Box>
           </ListItemButton>
           {bills &&
             bills.map((bill: any) => (
@@ -106,7 +106,7 @@ const Home: NextPage<any> = ({ data }) => {
           Your bills
         </Typography>
         {/*  <h2 className="pb-3 mt-4 mb-3 border-bottom">Your bills</h2>  */}
-        <ListGroup>{renderBillsList(bills)}</ListGroup>
+        <List>{renderBillsList(bills)}</List>
       </div>
     )
   }

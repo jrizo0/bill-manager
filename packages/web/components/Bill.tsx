@@ -53,7 +53,7 @@ const Bill = ({ bill, onPayBill, onDeleteBill, isLoading }: BillProps) => {
     <>
       <ListItem
         sx={{
-          py: 3,
+          py: 1,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -103,7 +103,7 @@ const Bill = ({ bill, onPayBill, onDeleteBill, isLoading }: BillProps) => {
             href={bill.paymentWeb}
             target='_blank'
             rel='noopener noreferrer'
-            sx={{ mx: 2, my: 1, fontWeight: 'regular' }}
+            sx={{ mx: 2, pb: 1, fontWeight: 'regular' }}
           >
             {new URL(bill.paymentWeb).host}
           </Link>
