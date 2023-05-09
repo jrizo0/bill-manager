@@ -1,4 +1,4 @@
-import * as React from 'react'
+import DeleteIcon from '@mui/icons-material/Delete'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import IconButton from '@mui/material/IconButton'
-import DeleteIcon from '@mui/icons-material/Delete'
+import * as React from 'react'
 
 export default function DeleteButton({ onConfirm }: any) {
   const [open, setOpen] = React.useState(false)

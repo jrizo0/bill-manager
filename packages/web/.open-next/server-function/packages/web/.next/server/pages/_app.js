@@ -4,7 +4,7 @@ exports.id = 888;
 exports.ids = [888];
 exports.modules = {
 
-/***/ 559:
+/***/ 669:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -22,8 +22,6 @@ var jsx_runtime = __webpack_require__(458);
 var globals = __webpack_require__(639);
 // EXTERNAL MODULE: external "aws-amplify"
 var external_aws_amplify_ = __webpack_require__(581);
-// EXTERNAL MODULE: ../../node_modules/.pnpm/bootstrap@5.2.3_@popperjs+core@2.11.7/node_modules/bootstrap/dist/css/bootstrap.min.css
-var bootstrap_min = __webpack_require__(95);
 ;// CONCATENATED MODULE: ./config.tsx
 const config = {
     MAX_ATTACHMENT_SIZE: 5000000,
@@ -96,6 +94,28 @@ var _400 = __webpack_require__(667);
 var _500 = __webpack_require__(955);
 // EXTERNAL MODULE: ../../node_modules/.pnpm/@fontsource+roboto@4.5.8/node_modules/@fontsource/roboto/700.css
 var _700 = __webpack_require__(198);
+// EXTERNAL MODULE: external "react"
+var external_react_ = __webpack_require__(689);
+// EXTERNAL MODULE: external "@mui/material"
+var material_ = __webpack_require__(692);
+;// CONCATENATED MODULE: ./components/Layout.tsx
+
+
+
+function Layout({ children  }) {
+    return /*#__PURE__*/ jsx_runtime.jsx(jsx_runtime.Fragment, {
+        children: /*#__PURE__*/ jsx_runtime.jsx(material_.Box, {
+            sx: {
+                py: 3,
+                maxWidth: "80%",
+                margin: "auto"
+            },
+            children: children
+        })
+    });
+}
+/* harmony default export */ const components_Layout = (Layout);
+
 ;// CONCATENATED MODULE: ./pages/_app.tsx
 
 
@@ -149,18 +169,14 @@ function App({ Component , pageProps  }) {
     <Routes />
   </AppContext.Provider>
 
-  */ return(// <Layout>
-    //   <Component {...pageProps} />
-    // </Layout>
-    /*#__PURE__*/ (0,jsx_runtime.jsxs)("div", {
-        className: "App container py-3",
+  */ return /*#__PURE__*/ (0,jsx_runtime.jsxs)(components_Layout, {
         children: [
             /*#__PURE__*/ jsx_runtime.jsx(ButtonAppBar, {}),
             /*#__PURE__*/ jsx_runtime.jsx(Component, {
                 ...pageProps
             })
         ]
-    }));
+    });
 }
 
 
@@ -194,13 +210,6 @@ function App({ Component , pageProps  }) {
 
 /***/ }),
 
-/***/ 95:
-/***/ (() => {
-
-
-
-/***/ }),
-
 /***/ 730:
 /***/ (() => {
 
@@ -212,6 +221,14 @@ function App({ Component , pageProps  }) {
 /***/ (() => {
 
 
+
+/***/ }),
+
+/***/ 692:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("@mui/material");
 
 /***/ }),
 
@@ -254,7 +271,7 @@ module.exports = require("react");
 var __webpack_require__ = require("../webpack-runtime.js");
 __webpack_require__.C(exports);
 var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-var __webpack_exports__ = __webpack_require__.X(0, [458], () => (__webpack_exec__(559)));
+var __webpack_exports__ = __webpack_require__.X(0, [458], () => (__webpack_exec__(669)));
 module.exports = __webpack_exports__;
 
 })();
