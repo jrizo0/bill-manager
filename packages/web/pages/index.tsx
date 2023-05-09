@@ -72,7 +72,9 @@ const Home: NextPage<any> = ({ data }) => {
             sx={{ py: 3, borderRadius: '10px' }}
           >
             <BsPencilSquare size={17} />
-            <Box mx={{ marginInlineStart: 4, fontWeight: "bold" }} >Create a new bill</Box>
+            <Box mx={{ marginInlineStart: 4, fontWeight: 'bold' }}>
+              Create a new bill
+            </Box>
           </ListItemButton>
           {bills &&
             bills.map((bill: any) => (

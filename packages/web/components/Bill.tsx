@@ -31,21 +31,23 @@ const Bill = ({ bill, onPayBill, onDeleteBill, isLoading }: BillProps) => {
       </LoadingButton>
     )
   }
-  function renderExpiration() {
+
+  const renderExpiration = () => {
     const daysLeft = bill.expirationDay - new Date().getDate()
-    return bill.paid ? (
-      <></>
-    ) : daysLeft > 0 ? (
-      <Typography variant='body1' sx={{ fontWeight: 'regular', mx: 2 }}>
-        Expires in {daysLeft} days
-      </Typography>
-    ) : (
-      <Typography
-        variant='body1'
-        sx={{ fontWeight: 'bold', mx: 2, color: '#FF0000' }}
-      >
-        Expired {-daysLeft} days ago
-      </Typography>
+    return (
+      !bill.paid &&
+      (daysLeft > 0 ? (
+        <Typography variant='body1' sx={{ fontWeight: 'regular', mx: 2 }}>
+          Expires in {daysLeft} days
+        </Typography>
+      ) : (
+        <Typography
+          variant='body1'
+          sx={{ fontWeight: 'bold', mx: 2, color: '#FF0000' }}
+        >
+          Expired {-daysLeft} days ago
+        </Typography>
+      ))
     )
   }
 
