@@ -1,27 +1,37 @@
-import { Bucket, StackContext, Table } from "sst/constructs";
+import { StackContext, Table } from 'sst/constructs'
 
 export function StorageStack({ stack, app }: StackContext) {
-  const tableBills = new Table(stack, "Bills", {
+  const tableUsers = new Table(stack, 'Users', {
     fields: {
-      userID: "string",
-      billID: "string",
-      tag: "string",
-      paymentWeb: "string",
-      expirationDay: "number",
-      reference: "string",
-      created: "string",
+      userId: 'string',
+      email: 'string',
+      pictureURL: 'string',
+      name: 'string',
     },
-    primaryIndex: { partitionKey: "userID", sortKey: "billID" },
-  });
+    primaryIndex: { partitionKey: 'userId' },
+  })
 
-  const tablePayments = new Table(stack, "Payments", {
+  const tableBills = new Table(stack, 'Bills', {
     fields: {
-      billID: "string",
-      month: "number",
-      year: "number",
-      created: "string",
+      userID: 'string',
+      billID: 'string',
+      tag: 'string',
+      paymentWeb: 'string',
+      expirationDay: 'number',
+      reference: 'string',
+      created: 'string',
     },
-    primaryIndex: { partitionKey: "billID", sortKey: "month" },
+    primaryIndex: { partitionKey: 'userID', sortKey: 'billID' },
+  })
+
+  const tablePayments = new Table(stack, 'Payments', {
+    fields: {
+      billID: 'string',
+      month: 'number',
+      year: 'number',
+      created: 'string',
+    },
+    primaryIndex: { partitionKey: 'billID', sortKey: 'month' },
   })
 
   //TODO: enhancement uploads:
@@ -37,7 +47,8 @@ export function StorageStack({ stack, app }: StackContext) {
   // });
 
   return {
+    tableUsers: tableUsers,
     tableBills: tableBills,
     tablePayments: tablePayments,
-  };
+  }
 }

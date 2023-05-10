@@ -6,7 +6,7 @@ import Link from '@mui/material/Link'
 import ListItem from '@mui/material/ListItem'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { bill } from '../types/bill'
+import { bill } from '@/types/bill'
 import DeleteButton from './DeleteButton'
 
 type BillProps = {

@@ -4,21 +4,33 @@ import ListItemButton from '@mui/material/ListItemButton'
 import Typography from '@mui/material/Typography'
 import { API } from 'aws-amplify'
 import { NextPage } from 'next'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { BsPencilSquare } from 'react-icons/bs'
 import { onError } from '../lib/errorLib'
 import Box from '@mui/material/Box'
+import { useAppContext } from '@/lib/contextLib'
+import { SessionContext } from '@/context/session'
 
-const Home: NextPage<any> = ({ data }) => {
-  const [bills, setBills] = useState<any>(data)
+const Home: NextPage<any> = () => {
+  const [bills, setBills] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
+  const { session, setSession } = useContext(SessionContext)
+
+  useEffect(() => {
+    const search = window.location.search
+    const params = new URLSearchParams(search)
+    const token = params.get('token')
+    if (token) {
+      localStorage.setItem('session', token)
+      window.location.replace(window.location.origin)
+    }
+  }, [])
 
   useEffect(() => {
     async function onLoad() {
       try {
         const bills = await loadBills()
         setBills(bills)
-        console.log(bills)
       } catch (e) {
         onError(e)
       }
@@ -29,7 +41,8 @@ const Home: NextPage<any> = ({ data }) => {
   }, [])
 
   function loadBills() {
-    return API.get('bills', '/bills', {})
+    // TODO: Bills for every user
+    return API.get('bills', '/bills/1', {})
   }
 
   async function handlePayBill(_id: any) {
@@ -52,7 +65,8 @@ const Home: NextPage<any> = ({ data }) => {
   async function handleDeleteBill(_id: any) {
     setIsLoading(true)
     try {
-      await API.del('bills', `/bills/${_id}`, {})
+      //TODO: Delete bill for every user
+      await API.del('bills', `/bills/1/${_id}`, {})
       setBills((prev: any) => [
         ...prev.filter((bill: any) => bill.billID != _id),
       ])
@@ -68,7 +82,7 @@ const Home: NextPage<any> = ({ data }) => {
         <List>
           <ListItemButton
             divider={true}
-            href='/bills/naw'
+            href='/bills/new'
             sx={{ py: 3, borderRadius: '10px' }}
           >
             <BsPencilSquare size={17} />
@@ -116,22 +130,12 @@ const Home: NextPage<any> = ({ data }) => {
   return (
     <>
       <div className='Home'>
-        {/* isAuthenticated ? renderBills() : renderLander() */}
-        {renderBills()}
+        {session ? renderBills() : renderLander()}
+        {/* renderBills() */}
         {/* renderLander() */}
       </div>
     </>
   )
 }
-
-// export const getServerSideProps: GetServerSideProps<any> = async () => {
-//   try {
-//     const data = await API.get("bills", "/bills", {});
-//     return { props: { data } }
-//   } catch (e) {
-//     onError(e);
-//     return { props: [] }
-//   }
-// }
 
 export default Home

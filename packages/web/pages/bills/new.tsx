@@ -11,6 +11,8 @@ export default function NewBill() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [bill, setBill] = useState<any>({
+    //TODO: Create bill for every user
+    userID: '1',
     tag: '',
     paymentWeb: '',
     expirationDay: 0,
