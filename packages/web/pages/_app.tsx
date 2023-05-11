@@ -1,7 +1,7 @@
 import AppBar from '@/components/AppBar'
 import Layout from '@/components/Layout'
 import config from '@/config'
-import { SessionProvider } from '@/context/session'
+import { TokenProvider } from '@/context/session'
 import '@/styles/globals.css'
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
@@ -27,11 +27,11 @@ export default function App({ Component, pageProps }: AppProps) {
 
   // RETURN COMPONENT
   return (
-    <SessionProvider>
+    <TokenProvider>
       <Layout>
         <AppBar />
         <Component {...pageProps} />
       </Layout>
-    </SessionProvider>
+    </TokenProvider>
   )
 }

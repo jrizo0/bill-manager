@@ -1,25 +1,25 @@
 import React, { createContext, useState } from 'react'
 
 interface SessionContextProps {
-  session: string | null
-  setSession: (token: string | null) => void
+  token: string | null
+  setToken: (token: string | null) => void
 }
 
-export const SessionContext = createContext<SessionContextProps>({
-  session: null,
-  setSession: () => {},
+export const TokenContext = createContext<SessionContextProps>({
+  token: null,
+  setToken: () => { },
 })
 
 interface SessionProviderProps {
   children: React.ReactNode
 }
 
-export function SessionProvider({ children }: SessionProviderProps) {
-  const [session, setSession] = useState<string | null>(null)
+export function TokenProvider({ children }: SessionProviderProps) {
+  const [token, setToken] = useState<string | null>(null)
 
   return (
-    <SessionContext.Provider value={{ session, setSession }}>
+    <TokenContext.Provider value={{ token: token, setToken: setToken }}>
       {children}
-    </SessionContext.Provider>
+    </TokenContext.Provider>
   )
 }

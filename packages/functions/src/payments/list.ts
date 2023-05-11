@@ -1,7 +1,7 @@
-import { Payment } from "@bill-manager/core/payment";
-import handler from "../handler";
+import { Payment } from '@bill-manager/core/payment'
+import handler from 'src/auth/handler'
 
-export const main = handler(async (event: any) => {
+export const main = handler(async (event: any, session: any) => {
   const params = {
     billID: event.pathParameters.id,
   }
@@ -9,5 +9,4 @@ export const main = handler(async (event: any) => {
   const result = await Payment.list(params)
 
   return result
-});
-
+})

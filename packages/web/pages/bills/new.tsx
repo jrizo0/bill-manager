@@ -1,3 +1,5 @@
+import { TokenContext } from '@/context/session'
+import { headerAuthToken } from '@/lib/awsLib'
 import { onError } from '@/lib/errorLib'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { Stack } from '@mui/material'
@@ -5,14 +7,13 @@ import FormControl from '@mui/material/FormControl'
 import TextField from '@mui/material/TextField'
 import { API } from 'aws-amplify'
 import { useRouter } from 'next/router'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useContext, useState } from 'react'
 
 export default function NewBill() {
   const router = useRouter()
+  const { token } = useContext(TokenContext)
   const [isLoading, setIsLoading] = useState(false)
   const [bill, setBill] = useState<any>({
-    //TODO: Create bill for every user
-    userID: '1',
     tag: '',
     paymentWeb: '',
     expirationDay: 0,
@@ -27,19 +28,15 @@ export default function NewBill() {
     event.preventDefault()
     setIsLoading(true)
     try {
-      const response = await createBill(bill)
-      console.log(response)
+      await API.post('bills', '/bills', {
+        body: bill,
+        ...headerAuthToken(token),
+      })
       router.push('/')
     } catch (e) {
       onError(e)
       setIsLoading(false)
     }
-  }
-
-  function createBill(bill: any) {
-    return API.post('bills', '/bills', {
-      body: bill,
-    })
   }
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {

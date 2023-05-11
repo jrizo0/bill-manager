@@ -1,8 +1,8 @@
 import { SSTConfig } from 'sst'
-import { ApiStack } from './stacks/ApiStack'
-import { StorageStack } from './stacks/StorageStack'
-import { FrontendStack } from './stacks/FrontendStack'
-import { AuthStack } from './stacks/AuthStack'
+import { Api } from './stacks/Api'
+import { Database } from './stacks/Database'
+import { FrontendStack } from './stacks/Web'
+import { Authentication } from './stacks/Authentication'
 
 export default {
   config(_input) {
@@ -14,10 +14,7 @@ export default {
   stacks(app) {
     if (!['prod', 'stage'].includes(app.stage))
       app.setDefaultRemovalPolicy('destroy')
-    app
-      .stack(StorageStack)
-      .stack(ApiStack)
-      .stack(FrontendStack)
-      .stack(AuthStack)
+
+    app.stack(Database).stack(Authentication).stack(Api).stack(FrontendStack)
   },
 } satisfies SSTConfig

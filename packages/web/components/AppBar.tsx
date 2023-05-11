@@ -1,54 +1,47 @@
 import config from '@/config'
-import { SessionContext } from '@/context/session'
+import { TokenContext } from '@/context/session'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Link from '@mui/material/Link'
 import Toolbar from '@mui/material/Toolbar'
-import { API } from 'aws-amplify'
 import { useContext, useEffect } from 'react'
 
 export default function ButtonAppBar() {
-  const { session, setSession } = useContext(SessionContext)
+  const { token: session, setToken: setSession } = useContext(TokenContext)
 
   useEffect(() => {
     const getSession = async () => {
-      const token = localStorage.getItem('session')
-      if (token) {
-        const user = await getUserInfo(token)
-        if (user) setSession(user)
-      }
+      const token = localStorage.getItem('access_token')
+      if (token) setSession(token)
     }
     getSession()
   }, [setSession])
 
   useEffect(() => {
-    const search = window.location.search
-    const params = new URLSearchParams(search)
-    const token = params.get('token')
-    if (token) {
-      localStorage.setItem('session', token)
+    const access_token = new URLSearchParams(
+      window.location.hash.substring(1)
+    ).get('access_token')
+
+    if (access_token) {
+      localStorage.setItem('access_token', access_token)
       window.location.replace(window.location.origin)
     }
   }, [])
 
-  const getUserInfo = async (session: any) => {
-    try {
-      const response = await API.get('bills', '/session', {
-        headers: {
-          Authorization: `Bearer ${session}`,
-        },
-      })
-      return response
-    } catch (error) {
-      // alert(error)
-      console.error(error)
-    }
+  const signOut = async () => {
+    localStorage.removeItem('access_token')
+    setSession(null)
   }
 
-  const signOut = async () => {
-    localStorage.removeItem('session')
-    setSession(null)
+  const handleSignIn = () => {
+    const params = new URLSearchParams({
+      client_id: 'local',
+      redirect_uri: location.origin,
+      response_type: 'token',
+      provider: 'google',
+    })
+    location.href = config.auth.URL + '/authorize?' + params.toString()
   }
 
   return (
@@ -71,10 +64,7 @@ export default function ButtonAppBar() {
             </>
           ) : (
             <>
-              <Button
-                color='inherit'
-                href={`${config.apiGateway.URL}/auth/google/authorize`}
-              >
+              <Button color='inherit' onClick={handleSignIn}>
                 Login
               </Button>
             </>
