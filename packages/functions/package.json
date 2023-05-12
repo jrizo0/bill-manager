@@ -9,7 +9,7 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.114",
     "@types/node": "^18.15.13",
-    "sst": "^2.5.8"
+    "sst": "2.8.20"
   },
   "dependencies": {
     "aws-sdk": "^2.1363.0",
