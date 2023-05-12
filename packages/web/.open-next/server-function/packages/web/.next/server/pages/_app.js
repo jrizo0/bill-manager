@@ -9,24 +9,24 @@ exports.modules = {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "B": () => (/* binding */ SessionContext),
-/* harmony export */   "e": () => (/* binding */ SessionProvider)
+/* harmony export */   "B": () => (/* binding */ TokenProvider),
+/* harmony export */   "M": () => (/* binding */ TokenContext)
 /* harmony export */ });
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(458);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(689);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 
 
-const SessionContext = /*#__PURE__*/ (0,react__WEBPACK_IMPORTED_MODULE_1__.createContext)({
-    session: null,
-    setSession: ()=>{}
+const TokenContext = /*#__PURE__*/ (0,react__WEBPACK_IMPORTED_MODULE_1__.createContext)({
+    token: null,
+    setToken: ()=>{}
 });
-function SessionProvider({ children  }) {
-    const [session, setSession] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null);
-    return /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(SessionContext.Provider, {
+function TokenProvider({ children  }) {
+    const [token, setToken] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null);
+    return /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(TokenContext.Provider, {
         value: {
-            session,
-            setSession
+            token: token,
+            setToken: setToken
         },
         children: children
     });
@@ -55,6 +55,9 @@ const config = {
     apiGateway: {
         URL: "{{ NEXT_PUBLIC_API_URL }}",
         REGION: "us-east-1"
+    },
+    auth: {
+        URL: "{{ NEXT_PUBLIC_AUTH_URL }}"
     }
 };
 /* harmony default export */ const config_0 = (config);
@@ -76,8 +79,6 @@ var Link_default = /*#__PURE__*/__webpack_require__.n(Link_);
 ;// CONCATENATED MODULE: external "@mui/material/Toolbar"
 const Toolbar_namespaceObject = require("@mui/material/Toolbar");
 var Toolbar_default = /*#__PURE__*/__webpack_require__.n(Toolbar_namespaceObject);
-// EXTERNAL MODULE: external "aws-amplify"
-var external_aws_amplify_ = __webpack_require__(581);
 // EXTERNAL MODULE: external "react"
 var external_react_ = __webpack_require__(689);
 ;// CONCATENATED MODULE: ./components/AppBar.tsx
@@ -90,47 +91,36 @@ var external_react_ = __webpack_require__(689);
 
 
 
-
 function ButtonAppBar() {
-    const { session , setSession  } = (0,external_react_.useContext)(context_session/* SessionContext */.B);
+    const { token: session , setToken: setSession  } = (0,external_react_.useContext)(context_session/* TokenContext */.M);
     (0,external_react_.useEffect)(()=>{
-        console.log(`${config_0.apiGateway.URL}/auth/google/authorize`);
         const getSession = async ()=>{
-            const token = localStorage.getItem("session");
-            if (token) {
-                const user = await getUserInfo(token);
-                if (user) setSession(user);
-            }
+            const token = localStorage.getItem("access_token");
+            if (token) setSession(token);
         };
         getSession();
     }, [
         setSession
     ]);
     (0,external_react_.useEffect)(()=>{
-        const search = window.location.search;
-        const params = new URLSearchParams(search);
-        const token = params.get("token");
-        if (token) {
-            localStorage.setItem("session", token);
+        const access_token = new URLSearchParams(window.location.hash.substring(1)).get("access_token");
+        if (access_token) {
+            localStorage.setItem("access_token", access_token);
             window.location.replace(window.location.origin);
         }
     }, []);
-    const getUserInfo = async (session)=>{
-        try {
-            const response = await external_aws_amplify_.API.get("bills", "/session", {
-                headers: {
-                    Authorization: `Bearer ${session}`
-                }
-            });
-            return response;
-        } catch (error) {
-            // alert(error)
-            console.error(error);
-        }
-    };
     const signOut = async ()=>{
-        localStorage.removeItem("session");
+        localStorage.removeItem("access_token");
         setSession(null);
+    };
+    const handleSignIn = ()=>{
+        const params = new URLSearchParams({
+            client_id: "local",
+            redirect_uri: location.origin,
+            response_type: "token",
+            provider: "google"
+        });
+        location.href = config_0.auth.URL + "/authorize?" + params.toString();
     };
     return /*#__PURE__*/ jsx_runtime.jsx((Box_default()), {
         sx: {
@@ -163,7 +153,7 @@ function ButtonAppBar() {
                     }) : /*#__PURE__*/ jsx_runtime.jsx(jsx_runtime.Fragment, {
                         children: /*#__PURE__*/ jsx_runtime.jsx((Button_default()), {
                             color: "inherit",
-                            href: `${config_0.apiGateway.URL}/auth/google/authorize`,
+                            onClick: handleSignIn,
                             children: "Login"
                         })
                     })
@@ -203,6 +193,8 @@ var _400 = __webpack_require__(667);
 var _500 = __webpack_require__(955);
 // EXTERNAL MODULE: ../../node_modules/.pnpm/@fontsource+roboto@4.5.8/node_modules/@fontsource/roboto/700.css
 var _700 = __webpack_require__(198);
+// EXTERNAL MODULE: external "aws-amplify"
+var external_aws_amplify_ = __webpack_require__(581);
 // EXTERNAL MODULE: ./styles/Home.css
 var Home = __webpack_require__(730);
 ;// CONCATENATED MODULE: ./pages/_app.tsx
@@ -232,7 +224,7 @@ function App({ Component , pageProps  }) {
         }
     });
     // RETURN COMPONENT
-    return /*#__PURE__*/ jsx_runtime.jsx(context_session/* SessionProvider */.e, {
+    return /*#__PURE__*/ jsx_runtime.jsx(context_session/* TokenProvider */.B, {
         children: /*#__PURE__*/ (0,jsx_runtime.jsxs)(components_Layout, {
             children: [
                 /*#__PURE__*/ jsx_runtime.jsx(ButtonAppBar, {}),
