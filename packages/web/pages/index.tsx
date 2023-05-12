@@ -1,47 +1,43 @@
 import Bill from '@/components/Bill'
+import { TokenContext } from '@/context/session'
+import { headerAuthToken } from '@/lib/awsLib'
+import Box from '@mui/material/Box'
 import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
 import Typography from '@mui/material/Typography'
 import { API } from 'aws-amplify'
 import { NextPage } from 'next'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { BsPencilSquare } from 'react-icons/bs'
 import { onError } from '../lib/errorLib'
-import Box from '@mui/material/Box'
 
-const Home: NextPage<any> = ({ data }) => {
-  const [bills, setBills] = useState<any>(data)
+const Home: NextPage<any> = () => {
+  const [bills, setBills] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
+  const { token } = useContext(TokenContext)
 
   useEffect(() => {
     async function onLoad() {
       try {
-        const bills = await loadBills()
+        const bills = await API.get('bills', '/bills', headerAuthToken(token))
         setBills(bills)
-        console.log(bills)
       } catch (e) {
         onError(e)
       }
       setIsLoading(false)
     }
 
-    onLoad()
-  }, [])
-
-  function loadBills() {
-    return API.get('bills', '/bills', {})
-  }
+    if (token) onLoad()
+  }, [token])
 
   async function handlePayBill(_id: any) {
     setIsLoading(true)
     try {
-      await API.post('bills', `/payments/${_id}`, {})
-      const newBills: any = bills.map((bill: any) => {
-        if (bill.billID == _id) {
-          bill.paid = true
-        }
-        return bill
-      })
+      await API.post('bills', `/payments/${_id}`, headerAuthToken(token))
+      const index = bills.findIndex((bill: any) => bill.billID === _id)
+      const updatedBill = { ...bills[index], paid: true }
+      const newBills = [...bills]
+      newBills[index] = updatedBill
       setBills(newBills)
     } catch (e: any) {
       onError(e)
@@ -52,7 +48,7 @@ const Home: NextPage<any> = ({ data }) => {
   async function handleDeleteBill(_id: any) {
     setIsLoading(true)
     try {
-      await API.del('bills', `/bills/${_id}`, {})
+      await API.del('bills', `/bills/${_id}`, headerAuthToken(token))
       setBills((prev: any) => [
         ...prev.filter((bill: any) => bill.billID != _id),
       ])
@@ -68,7 +64,7 @@ const Home: NextPage<any> = ({ data }) => {
         <List>
           <ListItemButton
             divider={true}
-            href='/bills/naw'
+            href='/bills/new'
             sx={{ py: 3, borderRadius: '10px' }}
           >
             <BsPencilSquare size={17} />
@@ -116,22 +112,12 @@ const Home: NextPage<any> = ({ data }) => {
   return (
     <>
       <div className='Home'>
-        {/* isAuthenticated ? renderBills() : renderLander() */}
-        {renderBills()}
+        {token ? renderBills() : renderLander()}
+        {/* renderBills() */}
         {/* renderLander() */}
       </div>
     </>
   )
 }
-
-// export const getServerSideProps: GetServerSideProps<any> = async () => {
-//   try {
-//     const data = await API.get("bills", "/bills", {});
-//     return { props: { data } }
-//   } catch (e) {
-//     onError(e);
-//     return { props: [] }
-//   }
-// }
 
 export default Home

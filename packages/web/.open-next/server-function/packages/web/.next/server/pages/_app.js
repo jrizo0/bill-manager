@@ -4,6 +4,37 @@ exports.id = 888;
 exports.ids = [888];
 exports.modules = {
 
+/***/ 227:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "B": () => (/* binding */ TokenProvider),
+/* harmony export */   "M": () => (/* binding */ TokenContext)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(458);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(689);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+
+
+const TokenContext = /*#__PURE__*/ (0,react__WEBPACK_IMPORTED_MODULE_1__.createContext)({
+    token: null,
+    setToken: ()=>{}
+});
+function TokenProvider({ children  }) {
+    const [token, setToken] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null);
+    return /*#__PURE__*/ react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx(TokenContext.Provider, {
+        value: {
+            token: token,
+            setToken: setToken
+        },
+        children: children
+    });
+}
+
+
+/***/ }),
+
 /***/ 669:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -18,41 +49,79 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ../../node_modules/.pnpm/react@18.2.0/node_modules/react/jsx-runtime.js
 var jsx_runtime = __webpack_require__(458);
-// EXTERNAL MODULE: ./styles/globals.css
-var globals = __webpack_require__(639);
-// EXTERNAL MODULE: external "aws-amplify"
-var external_aws_amplify_ = __webpack_require__(581);
 ;// CONCATENATED MODULE: ./config.tsx
 const config = {
     MAX_ATTACHMENT_SIZE: 5000000,
     apiGateway: {
         URL: "{{ NEXT_PUBLIC_API_URL }}",
         REGION: "us-east-1"
+    },
+    auth: {
+        URL: "{{ NEXT_PUBLIC_AUTH_URL }}"
     }
 };
 /* harmony default export */ const config_0 = (config);
 
-// EXTERNAL MODULE: ./styles/Home.css
-var Home = __webpack_require__(730);
+// EXTERNAL MODULE: ./context/session.tsx
+var context_session = __webpack_require__(227);
 ;// CONCATENATED MODULE: external "@mui/material/AppBar"
 const AppBar_namespaceObject = require("@mui/material/AppBar");
 var AppBar_default = /*#__PURE__*/__webpack_require__.n(AppBar_namespaceObject);
 // EXTERNAL MODULE: external "@mui/material/Box"
 var Box_ = __webpack_require__(19);
 var Box_default = /*#__PURE__*/__webpack_require__.n(Box_);
+// EXTERNAL MODULE: external "@mui/material/Button"
+var Button_ = __webpack_require__(819);
+var Button_default = /*#__PURE__*/__webpack_require__.n(Button_);
 // EXTERNAL MODULE: external "@mui/material/Link"
 var Link_ = __webpack_require__(246);
 var Link_default = /*#__PURE__*/__webpack_require__.n(Link_);
 ;// CONCATENATED MODULE: external "@mui/material/Toolbar"
 const Toolbar_namespaceObject = require("@mui/material/Toolbar");
 var Toolbar_default = /*#__PURE__*/__webpack_require__.n(Toolbar_namespaceObject);
+// EXTERNAL MODULE: external "react"
+var external_react_ = __webpack_require__(689);
 ;// CONCATENATED MODULE: ./components/AppBar.tsx
 
 
 
 
 
+
+
+
+
 function ButtonAppBar() {
+    const { token: session , setToken: setSession  } = (0,external_react_.useContext)(context_session/* TokenContext */.M);
+    (0,external_react_.useEffect)(()=>{
+        const getSession = async ()=>{
+            const token = localStorage.getItem("access_token");
+            if (token) setSession(token);
+        };
+        getSession();
+    }, [
+        setSession
+    ]);
+    (0,external_react_.useEffect)(()=>{
+        const access_token = new URLSearchParams(window.location.hash.substring(1)).get("access_token");
+        if (access_token) {
+            localStorage.setItem("access_token", access_token);
+            window.location.replace(window.location.origin);
+        }
+    }, []);
+    const signOut = async ()=>{
+        localStorage.removeItem("access_token");
+        setSession(null);
+    };
+    const handleSignIn = ()=>{
+        const params = new URLSearchParams({
+            client_id: "local",
+            redirect_uri: location.origin,
+            response_type: "token",
+            provider: "google"
+        });
+        location.href = config_0.auth.URL + "/authorize?" + params.toString();
+    };
     return /*#__PURE__*/ jsx_runtime.jsx((Box_default()), {
         sx: {
             flexGrow: 1
@@ -60,42 +129,40 @@ function ButtonAppBar() {
         children: /*#__PURE__*/ jsx_runtime.jsx((AppBar_default()), {
             position: "static",
             color: "transparent",
-            children: /*#__PURE__*/ jsx_runtime.jsx((Toolbar_default()), {
-                children: /*#__PURE__*/ jsx_runtime.jsx((Link_default()), {
-                    href: "/",
-                    className: "fw-bold text-muted",
-                    style: {
-                        textDecoration: "none"
-                    },
-                    children: "Bill-Manager"
-                })
+            children: /*#__PURE__*/ (0,jsx_runtime.jsxs)((Toolbar_default()), {
+                children: [
+                    /*#__PURE__*/ jsx_runtime.jsx((Link_default()), {
+                        href: "/",
+                        className: "fw-bold text-muted",
+                        style: {
+                            textDecoration: "none"
+                        },
+                        sx: {
+                            flexGrow: 1,
+                            fontWeight: "bold",
+                            color: "inherit"
+                        },
+                        children: "Bill-Manager"
+                    }),
+                    session ? /*#__PURE__*/ jsx_runtime.jsx(jsx_runtime.Fragment, {
+                        children: /*#__PURE__*/ jsx_runtime.jsx((Button_default()), {
+                            color: "inherit",
+                            onClick: signOut,
+                            children: "Logout"
+                        })
+                    }) : /*#__PURE__*/ jsx_runtime.jsx(jsx_runtime.Fragment, {
+                        children: /*#__PURE__*/ jsx_runtime.jsx((Button_default()), {
+                            color: "inherit",
+                            onClick: handleSignIn,
+                            children: "Login"
+                        })
+                    })
+                ]
             })
         })
     });
-    {
-    // <Navbar collapseOnSelect bg="light" expand="md" className="mb-3 px-3">
-    //   <Link href="/" className="fw-bold text-muted" style={{ textDecoration: 'none' }}>Bill-Manager</Link>
-    //   <Navbar.Toggle />
-    // <Navbar.Collapse className="justify-content-end">
-    //   <>
-    //     <Button className="fw-bold text-muted" variant="link" href="/settings">Settings</Button>
-    //     <Button className="fw-bold text-muted" variant="link" onClick={handleLogout}>Logout</Button>
-    //   </>
-    // </Navbar.Collapse>
-    // </Navbar>
-    }
 }
 
-// EXTERNAL MODULE: ../../node_modules/.pnpm/@fontsource+roboto@4.5.8/node_modules/@fontsource/roboto/300.css
-var _300 = __webpack_require__(422);
-// EXTERNAL MODULE: ../../node_modules/.pnpm/@fontsource+roboto@4.5.8/node_modules/@fontsource/roboto/400.css
-var _400 = __webpack_require__(667);
-// EXTERNAL MODULE: ../../node_modules/.pnpm/@fontsource+roboto@4.5.8/node_modules/@fontsource/roboto/500.css
-var _500 = __webpack_require__(955);
-// EXTERNAL MODULE: ../../node_modules/.pnpm/@fontsource+roboto@4.5.8/node_modules/@fontsource/roboto/700.css
-var _700 = __webpack_require__(198);
-// EXTERNAL MODULE: external "react"
-var external_react_ = __webpack_require__(689);
 // EXTERNAL MODULE: external "@mui/material"
 var material_ = __webpack_require__(692);
 ;// CONCATENATED MODULE: ./components/Layout.tsx
@@ -116,6 +183,20 @@ function Layout({ children  }) {
 }
 /* harmony default export */ const components_Layout = (Layout);
 
+// EXTERNAL MODULE: ./styles/globals.css
+var globals = __webpack_require__(639);
+// EXTERNAL MODULE: ../../node_modules/.pnpm/@fontsource+roboto@4.5.8/node_modules/@fontsource/roboto/300.css
+var _300 = __webpack_require__(422);
+// EXTERNAL MODULE: ../../node_modules/.pnpm/@fontsource+roboto@4.5.8/node_modules/@fontsource/roboto/400.css
+var _400 = __webpack_require__(667);
+// EXTERNAL MODULE: ../../node_modules/.pnpm/@fontsource+roboto@4.5.8/node_modules/@fontsource/roboto/500.css
+var _500 = __webpack_require__(955);
+// EXTERNAL MODULE: ../../node_modules/.pnpm/@fontsource+roboto@4.5.8/node_modules/@fontsource/roboto/700.css
+var _700 = __webpack_require__(198);
+// EXTERNAL MODULE: external "aws-amplify"
+var external_aws_amplify_ = __webpack_require__(581);
+// EXTERNAL MODULE: ./styles/Home.css
+var Home = __webpack_require__(730);
 ;// CONCATENATED MODULE: ./pages/_app.tsx
 
 
@@ -128,7 +209,9 @@ function Layout({ children  }) {
 
 
 
+
 function App({ Component , pageProps  }) {
+    // AMPLIFY CONFIGURE
     external_aws_amplify_.Amplify.configure({
         API: {
             endpoints: [
@@ -140,42 +223,16 @@ function App({ Component , pageProps  }) {
             ]
         }
     });
-    /* EJEMPLO NOTES CON AUTH
-  const [isAuthenticating, setIsAuthenticating] = useState(true);
-  const [isAuthenticated, userHasAuthenticated] = useState(false);
-
-  useEffect(() => {
-  onLoad();
-  }, []);
-
-  async function onLoad() {
-    try {
-      await Auth.currentSession();
-      userHasAuthenticated(true);
-    } catch (e) {
-      if (e !== "No current user") {
-        onError(e);
-      }
-    }
-    setIsAuthenticating(false);
-  }
-
-  async function handleLogout() {
-    await Auth.signOut();
-    userHasAuthenticated(false);
-    nav("/login");
-  }
-  <AppContext.Provider value={{ isAuthenticated, userHasAuthenticated }}>
-    <Routes />
-  </AppContext.Provider>
-
-  */ return /*#__PURE__*/ (0,jsx_runtime.jsxs)(components_Layout, {
-        children: [
-            /*#__PURE__*/ jsx_runtime.jsx(ButtonAppBar, {}),
-            /*#__PURE__*/ jsx_runtime.jsx(Component, {
-                ...pageProps
-            })
-        ]
+    // RETURN COMPONENT
+    return /*#__PURE__*/ jsx_runtime.jsx(context_session/* TokenProvider */.B, {
+        children: /*#__PURE__*/ (0,jsx_runtime.jsxs)(components_Layout, {
+            children: [
+                /*#__PURE__*/ jsx_runtime.jsx(ButtonAppBar, {}),
+                /*#__PURE__*/ jsx_runtime.jsx(Component, {
+                    ...pageProps
+                })
+            ]
+        })
     });
 }
 
@@ -237,6 +294,14 @@ module.exports = require("@mui/material");
 
 "use strict";
 module.exports = require("@mui/material/Box");
+
+/***/ }),
+
+/***/ 819:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("@mui/material/Button");
 
 /***/ }),
 
