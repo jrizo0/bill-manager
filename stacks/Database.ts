@@ -1,41 +1,35 @@
 import { StackContext, Table } from 'sst/constructs'
 
 export function Database({ stack, app }: StackContext) {
-  const tableUsers = new Table(stack, 'Users', {
+  const table = new Table(stack, 'table', {
     fields: {
-      userID: 'string',
-      email: 'string',
-      name: 'string',
+      pk: 'string',
+      sk: 'string',
+      gsi1pk: 'string',
+      gsi1sk: 'string',
+      gsi2pk: 'string',
+      gsi2sk: 'string',
     },
-    primaryIndex: { partitionKey: 'userID' },
+    primaryIndex: {
+      partitionKey: 'pk',
+      sortKey: 'sk',
+    },
+    globalIndexes: {
+      gsi1: {
+        partitionKey: 'gsi1pk',
+        sortKey: 'gsi1sk',
+      },
+    },
   })
 
-  const tableBills = new Table(stack, 'Bills', {
-    fields: {
-      userID: 'string',
-      billID: 'string',
-      tag: 'string',
-      paymentWeb: 'string',
-      expirationDay: 'number',
-      reference: 'string',
-      created: 'string',
+  table.addGlobalIndexes({
+    gsi2: {
+      partitionKey: 'gsi2pk',
+      sortKey: 'gsi2sk',
     },
-    primaryIndex: { partitionKey: 'userID', sortKey: 'billID' },
-  })
-
-  const tablePayments = new Table(stack, 'Payments', {
-    fields: {
-      billID: 'string',
-      month: 'number',
-      year: 'number',
-      created: 'string',
-    },
-    primaryIndex: { partitionKey: 'billID', sortKey: 'month' },
   })
 
   return {
-    tableUsers: tableUsers,
-    tableBills: tableBills,
-    tablePayments: tablePayments,
+    table: table,
   }
 }

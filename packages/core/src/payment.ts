@@ -1,83 +1,87 @@
-import { Table } from "sst/node/table";
-import dynamodb from "./dynamodb";
+import { BillManager, CreatePaymentItem } from './entities'
 
 export * as Payment from './payment'
 
-export interface Info {
+export async function payBill(item: CreatePaymentItem, groupID: string) {
+  const result = await BillManager.transaction
+    .write(({ bill, payment }) => [
+      payment.create(item).commit(),
+      bill
+        .patch({ billID: item.billID, groupID: groupID })
+        .set({
+          lastPayment: item.created,
+        })
+        .commit(),
+    ])
+   .go()
+  if (result.canceled) throw new Error("Couldn't register payment")
+  return result
+}
+
+export async function get(input: {
+  paymentID: string
   billID: string
   month: number
   year: number
-  times: {
-    created: Date
-    deleted?: Date
-  }
-}
-
-export async function create(_input: {
-  billID: string,
-  created: string
 }) {
-  const date = new Date(_input.created)
-
-  const params = {
-    TableName: Table.Payments.tableName,
-    Item: {
-      billID: _input.billID,
-      month: date.getMonth(),
-      year: date.getFullYear(),
-      created: date.toISOString()
-    },
-  };
-
-  await dynamodb.put(params);
-
-  return params.Item;
+  return BillManager.entities.payment
+    .get({
+      paymentID: input.paymentID,
+      billID: input.billID,
+    })
+    .go()
 }
 
-export async function get(_input: {
-  billID: string,
-  month: number,
-}) {
-  const params = {
-    TableName: Table.Payments.tableName,
-    Key: {
-      billID: _input.billID,
-      month: _input.month,
-    },
-  };
-
-  const result = await dynamodb.get(params);
-
-  return result.Item;
-}
-
-export async function list(_input: {
+export async function listByBillByMonth(input: {
   billID: string
+  month: number
 }) {
-  const params = {
-    TableName: Table.Payments.tableName,
-    KeyConditionExpression: "billID = :billID",
-    ExpressionAttributeValues: {
-      ":billID": _input.billID
-    }
-  }
-  const result = await dynamodb.query(params)
-
-  return result.Items
+  return BillManager.entities.payment.query
+    .bill({
+      billID: input.billID,
+      month: input.month,
+    })
+    .go()
 }
 
-export async function remove(_input: {
-  billID: string,
-  month: number,
-}) {
-  const params = {
-    TableName: Table.Payments.tableName,
-    Key: {
-      billID: _input.billID,
-      month: _input.month
-    },
-  };
-  await dynamodb.delete(params);
+export async function list(input: { billID: string }) {
+  return BillManager.collections
+    .record({
+      billID: input.billID,
+    })
+    .go()
+}
 
-  return { status: true };
+export async function remove(input: {
+  paymentID: string
+  billID: string
+  groupID: string
+}) {
+  const lastPayment = await list(input)
+
+  const result = await BillManager.transaction
+    .write(({ bill, payment }) => [
+      payment
+        .delete({
+          billID: input.billID,
+          paymentID: input.paymentID,
+        })
+        .commit(),
+      bill
+        .patch({
+          billID: input.billID,
+          groupID: input.groupID,
+        })
+        .set({
+          lastPayment: lastPayment.data.payment.at(0)!.created,
+        })
+        .commit(),
+    ])
+    .go()
+  if (result.canceled) throw new Error("Couldn't remove payment")
+  return result
+}
+
+export async function update(input: {}) {
+  throw new Error('Not implemented')
 }
