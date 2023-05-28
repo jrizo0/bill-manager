@@ -16,10 +16,12 @@ export function Api({ stack }: StackContext) {
     },
     routes: {
       'POST     /groups':                     'packages/functions/src/groups/create.main',
+      'GET      /groups/{id}':                'packages/functions/src/groups/get.main',
       'GET      /groups/user':                'packages/functions/src/groups/list.main', // groups for user
       'PUT      /groups':                     'packages/functions/src/groups/update.main',
       'DELETE   /groups':                     'packages/functions/src/groups/delete.main',
-      'POST     /groups/add':                 'packages/functions/src/groups/addUser.main',
+      'POST     /groups/user':                 'packages/functions/src/groups/addUser.main',
+      'DELETE   /groups/user':                'packages/functions/src/groups/deleteUser.main',
       'GET      /groups/{id}/users':          'packages/functions/src/groups/listUsers.main', // users for group
 
       'POST     /bills':                      'packages/functions/src/bills/create.main',
@@ -30,10 +32,11 @@ export function Api({ stack }: StackContext) {
 
       'POST     /payments':                   'packages/functions/src/payments/create.main',
       'GET      /payments/{id}':              'packages/functions/src/payments/list.main',
-      // TODO: do i use u?
-      'GET      /payments/{bill}/{pay}':      'packages/functions/src/payments/get.main',
+      'GET      /payments/{bill}/{pay}':      'packages/functions/src/payments/get.main', // with attachment presigned URL
       // update?
       'DELETE   /payments':                   'packages/functions/src/payments/delete.main',
+
+      'GET      /user':                       'packages/functions/src/users/get.main',
     },
   })
 
