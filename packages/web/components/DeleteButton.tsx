@@ -8,7 +8,12 @@ import DialogTitle from '@mui/material/DialogTitle'
 import IconButton from '@mui/material/IconButton'
 import * as React from 'react'
 
-export default function DeleteButton({ onConfirm }: any) {
+type deleteButtonProps = {
+  onConfirm: any
+  confirmMsg: string
+}
+
+export default function DeleteButton(props: deleteButtonProps) {
   const [open, setOpen] = React.useState(false)
 
   const handleClickOpen = () => {
@@ -21,7 +26,7 @@ export default function DeleteButton({ onConfirm }: any) {
 
   const handleConfirm = () => {
     setOpen(false)
-    onConfirm()
+    props.onConfirm()
   }
   return (
     <div>
@@ -42,7 +47,7 @@ export default function DeleteButton({ onConfirm }: any) {
         <DialogTitle id='alert-dialog-title'>{'Confirmation'}</DialogTitle>
         <DialogContent>
           <DialogContentText id='alert-dialog-description'>
-            Are you sure you wnat to delete the bill?
+            {props.confirmMsg}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

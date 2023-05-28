@@ -1,22 +1,31 @@
 import config from '@/config'
-import { TokenContext } from '@/context/session'
+import { selectAuthToken, setAuthToken } from '@/store/authSlice'
+import { MenuItem, Typography } from '@mui/material'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Link from '@mui/material/Link'
 import Toolbar from '@mui/material/Toolbar'
-import { useContext, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
 
 export default function ButtonAppBar() {
-  const { token: session, setToken: setSession } = useContext(TokenContext)
+  const authToken = useSelector(selectAuthToken)
+  const dispatch = useDispatch()
+  const router = useRouter()
 
   useEffect(() => {
     const getSession = async () => {
       const token = localStorage.getItem('access_token')
-      if (token) setSession(token)
+      if (token) {
+        dispatch(setAuthToken(token))
+      }
     }
     getSession()
-  }, [setSession])
+  }, [dispatch])
 
   useEffect(() => {
     const access_token = new URLSearchParams(
@@ -31,7 +40,8 @@ export default function ButtonAppBar() {
 
   const signOut = async () => {
     localStorage.removeItem('access_token')
-    setSession(null)
+    dispatch(setAuthToken(null))
+    router.replace('/')
   }
 
   const handleSignIn = () => {
@@ -44,29 +54,48 @@ export default function ButtonAppBar() {
     location.href = config.auth.URL + '/authorize?' + params.toString()
   }
 
+  const goGroups = () => {
+    router.push('/groups')
+  }
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position='static' color='transparent'>
         <Toolbar>
-          <Link
+          <AccountBalanceWalletIcon
+            sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}
+          />
+          <Typography
+            variant='h6'
+            noWrap
+            component='a'
             href='/'
-            className='fw-bold text-muted'
-            style={{ textDecoration: 'none' }}
-            sx={{ flexGrow: 1, fontWeight: 'bold', color: 'inherit' }}
+            sx={{
+              mr: 2,
+              display: { xs: 'none', md: 'flex' },
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              // letterSpacing: '.3rem',
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
           >
-            Bill-Manager
-          </Link>
-          {session ? (
+            BillManager
+          </Typography>
+          {authToken ? (
             <>
-              <Button color='inherit' onClick={signOut}>
-                Logout
-              </Button>
+              <MenuItem onClick={goGroups}>
+                <Typography textAlign='center'>Groups</Typography>
+              </MenuItem>
+              <MenuItem sx={{ ml: 'auto' }} onClick={signOut}>
+                <Typography textAlign='center'>Logout</Typography>
+              </MenuItem>
             </>
           ) : (
             <>
-              <Button color='inherit' onClick={handleSignIn}>
-                Login
-              </Button>
+              <MenuItem sx={{ ml: 'auto' }} onClick={handleSignIn}>
+                <Typography textAlign='center'>Login</Typography>
+              </MenuItem>
             </>
           )}
         </Toolbar>

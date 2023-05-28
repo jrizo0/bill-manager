@@ -6,6 +6,5 @@ export function onError(error: any) {
     message = error.message;
   }
 
-  console.error("ONERROR: -->", error)
   alert(message);
 }
