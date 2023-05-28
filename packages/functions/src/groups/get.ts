@@ -1,4 +1,4 @@
-import { Bill } from '@bill-manager/core/bill'
+import { Group } from '@bill-manager/core/group'
 import { User } from '@bill-manager/core/user'
 import Joi from 'joi'
 import handler from 'src/auth/handler'
@@ -15,15 +15,16 @@ export const main = handler(async (event, session) => {
       body: 'Invalid Parameters for Api endpoint',
     }
 
-  const groupID =
-    data.value.id === 'user' ? session.properties.userID : data.value.id
-
   await User.userCanAccessGroup({
-    groupID: groupID,
+    groupID: data.value.id,
     userID: session.properties.userID,
   })
 
-  const result = await Bill.listByGroup(groupID)
+  const params = {
+    groupID: data.value.id,
+  }
+
+  const result = await Group.get(params)
 
   return {
     statusCode: 200,
