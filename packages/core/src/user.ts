@@ -7,13 +7,15 @@ export async function login(input: {
   name: string
   email: string
 }) {
-  let user = await get({ userID: input.userID })
+  try {
+    let user = await get({ userID: input.userID })
 
-  if (user.data) {
-    return user.data
+    if (user) return user
+
+    return await create(input)
+  } catch (error) {
+    throw new Error('login failed')
   }
-
-  return await create(input)
 }
 
 export async function create(input: {
@@ -57,6 +59,16 @@ export async function get(input: { userID: string }) {
       userID: input.userID,
     })
     .go()
+    .then((value) => value.data!)
+}
+
+export async function queryByEmail(input: { email: string }) {
+  return BillManager.entities.user.query
+    .email({
+      email: input.email,
+    })
+    .go()
+    .then((value) => value.data!.at(0))
 }
 
 export async function remove(input: { userID: string }) {
@@ -68,29 +80,32 @@ export async function remove(input: { userID: string }) {
 }
 
 export async function listUsersForGroup(input: { groupID: string }) {
-  return BillManager.collections
+  const data = await BillManager.collections
     .members({
       groupID: input.groupID,
     })
-    .go()
-    .then((items) => items)
-    .catch((reason) => {
-      throw new Error(reason)
-    })
+    .go({ order: 'desc' })
+
+  const usersIDs = data.data!.membership.map((val) => {
+    return { userID: val.userID }
+  })
+
+  return BillManager.entities.user.get(usersIDs).go({ concurrency: 1 })
 }
 
 export async function userCanAccessGroup(input: {
   groupID: string
   userID: string
 }) {
-  if(input.userID === input.groupID) return
+  if (input.userID === input.groupID) return
 
-  return listUsersForGroup(input)
-    .then((users) => {
-      if(!!users.data.membership.find(
-        (user) => user.userID === input.userID
-      )){
-        throw new Error("You can't access this group")
-      }
-    })
+  const usersForGroup = await listUsersForGroup(input)
+
+  const inGroup = usersForGroup.data.find(
+    (user) => user.userID === input.userID
+  )
+
+  if (!inGroup) {
+    throw new Error("You can't access this group")
+  }
 }

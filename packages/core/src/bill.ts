@@ -4,6 +4,8 @@ import {
   BillItem,
   BillQueryResponse,
 } from './entities'
+import { Group } from './group'
+import { Payment } from './payment'
 
 export * as Bill from './bill'
 
@@ -45,17 +47,54 @@ export async function listByGroup(groupID: string): Promise<BillQueryResponse> {
     })
 }
 
-export async function remove(input: { groupID: string; billID: string }) {
-  return BillManager.entities.bill
-    .remove({
-      billID: input.billID,
-      groupID: input.groupID,
+export async function listAllUser(userID: string) {
+  const groupsOfUser = await Group.listGroupsOfUser({ userID: userID })
+
+  let response = []
+
+  for (const group of groupsOfUser.data) {
+    const bills = await listByGroup(group.groupID)
+    response.push({
+      groupID: group.groupID,
+      groupName: group.name,
+      bills: bills,
+    })
+  }
+
+  return response
+}
+
+export async function getById(billID: string) {
+  return BillManager.entities.bill.query
+    .billLookup({
+      billID: billID,
     })
     .go()
-    .then((_) => 'Bill deleted')
-    .catch((_) => {
-      throw new Error('Bill could not be deleted')
-    })
+    .then((value) => value.data.at(0))
+}
+
+export async function remove(input: { groupID: string; billID: string }) {
+  try {
+    const payments = await Payment.list(input)
+    const paymentsIDs: { billID: string; paymentID: string }[] =
+      payments.data!.payment.map((val) => {
+        return { paymentID: val.paymentID, billID: val.billID }
+      })
+
+    await BillManager.entities.payment
+      .delete(paymentsIDs)
+      .go({ concurrency: 1 })
+
+    await BillManager.entities.bill
+      .remove({
+        billID: input.billID,
+        groupID: input.groupID,
+      })
+      .go()
+    return 'Bill deleted'
+  } catch (error) {
+    throw new Error('Bill could not be deleted')
+  }
 }
 
 export async function update(input: {
@@ -69,8 +108,7 @@ export async function update(input: {
 }) {
   const newProperties = Object.fromEntries(
     Object.entries(input).filter(
-      ([key, val]) =>
-        val !== undefined && !['groupID', 'billID'].includes(key)
+      ([key, val]) => val !== undefined && !['groupID', 'billID'].includes(key)
     )
   )
   if (Object.keys(newProperties).length === 0) return 'No info provided'
@@ -84,6 +122,6 @@ export async function update(input: {
     .go()
     .then((_item) => 'Bill updated')
     .catch((_err) => {
-      throw new Error('Bill could not be updated')
+      throw new Error('Bill could not be updated ' + _err)
     })
 }
