@@ -1,4 +1,5 @@
-import DynamoDB, { DocumentClient } from 'aws-sdk/clients/dynamodb'
+import DynamoDB from 'aws-sdk/clients/dynamodb'
+import { DocumentClient } from 'aws-sdk/lib/dynamodb/document_client'
 import { Table } from 'sst/node/table'
 
 export * as Dynamo from './dynamodb'
