@@ -31,7 +31,8 @@ import { onError } from '../lib/errorLib'
 const Home: NextPage<any> = () => {
   const [isLoading, setIsLoading] = useState(false)
   const authToken = useSelector(selectAuthToken)
-  const billsByGroups: billsByGroup[] | undefined = useSelector(selectBillsByGroups)
+  const billsByGroups: billsByGroup[] | undefined =
+    useSelector(selectBillsByGroups)
   const dispatch = useDispatch()
 
   let today = new Date()
@@ -51,7 +52,6 @@ const Home: NextPage<any> = () => {
       }
       setIsLoading(false)
     }
-
     if (authToken) onLoad()
   }, [billsByGroups, authToken, dispatch])
 
@@ -141,6 +141,21 @@ const Home: NextPage<any> = () => {
     )
   }
 
+  function isPaid(lastPayment: string, expirationDay: number) {
+    const dateLastPay = new Date(lastPayment)
+    const dateExpiration = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      expirationDay
+    )
+    if(dateLastPay.getFullYear() > dateExpiration.getFullYear())
+      return true
+    if(dateLastPay.getMonth() >= dateExpiration.getMonth())
+      return true
+    else
+      return false
+  }
+
   function renderBillsList(input: { bills: Bill.item[]; groupID: string }) {
     return (
       <>
@@ -161,14 +176,7 @@ const Home: NextPage<any> = () => {
                 key={bill.billID}
                 billID={bill.billID}
                 groupID={input.groupID}
-                paid={
-                  new Date(bill.lastPayment) >=
-                  new Date(
-                    today.getFullYear(),
-                    today.getMonth(),
-                    bill.expirationDay
-                  )
-                }
+                paid={isPaid(bill.lastPayment, bill.expirationDay)}
                 bill={bill}
                 isLoading={isLoading}
                 onPayBill={handlePayBill}
