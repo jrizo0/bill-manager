@@ -27,7 +27,7 @@ export async function payBill(input: {
     })
     const currentLastPaymentOfBill = moment(billInfo.lastPayment).utc()
 
-    if (creationDate > currentLastPaymentOfBill) {
+    if (creationDate > currentLastPaymentOfBill || !billInfo.lastPayment) {
       await BillManager.transaction
         .write(({ bill, payment }) => [
           payment
