@@ -1,4 +1,4 @@
-import { APIGatewayProxyEventV2 } from 'aws-lambda'
+import { APIGatewayProxyEventV2 } from 'aws-lambda/trigger/api-gateway-proxy';
 import { ApiHandler } from 'sst/node/api'
 import { SessionValue, useSession } from 'sst/node/future/auth'
 

@@ -1,7 +1,7 @@
 import { Bill } from '@bill-manager/core/bill'
 import { Payment } from '@bill-manager/core/payment'
 import { User } from '@bill-manager/core/user'
-import { S3 } from 'aws-sdk'
+import S3 from 'aws-sdk/clients/s3'
 import Joi from 'joi'
 import handler from 'src/auth/handler'
 
