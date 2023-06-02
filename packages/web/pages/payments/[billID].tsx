@@ -173,12 +173,15 @@ export default function Payments() {
       }
       setIsLoading(false)
     }
-
     if (!authToken) return
+
     const BILLID_IN_ROUTE = !!billID && typeof billID === 'string'
     if (BILLID_IN_ROUTE && !payments) {
       onLoad()
+      return
     }
+
+    payments && setDataFrameValues(payments)
   }, [billsbyGroups, authToken, billID, payments])
 
   async function handlePayBill(input: {
@@ -200,7 +203,7 @@ export default function Payments() {
         ? moment(input.created).utc()
         : moment.utc()
       const currentLastPaymentOfBill = moment(input.bill.lastPayment).utc()
-      if (creationDate > currentLastPaymentOfBill) {
+      if (creationDate > currentLastPaymentOfBill || !input.bill.lastPayment) {
         dispatch(
           setLastPayment({
             groupID: input.groupID,
@@ -209,6 +212,7 @@ export default function Payments() {
           })
         )
       }
+      // router.reload()
     } catch (e: any) {
       onError(e)
     }
