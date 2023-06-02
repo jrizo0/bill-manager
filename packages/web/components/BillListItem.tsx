@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/router'
 import PayButton from './BillPayButton'
 import DeleteButton from './DeleteButton'
-import EditAttributesIcon from '@mui/icons-material/EditAttributes'
+import EditIcon from '@mui/icons-material/Edit'
 
 type props = {
   billID: string
@@ -44,7 +44,7 @@ const BillListItem = (props: props) => {
       !props.paid &&
       (daysLeft > 0 ? (
         <Typography variant='body1' sx={{ fontWeight: 'regular', mx: 2 }}>
-          Expires in {daysLeft} days
+          Expires in {daysLeft} days (day {props.bill.expirationDay})
         </Typography>
       ) : (
         <Typography
@@ -114,15 +114,15 @@ const BillListItem = (props: props) => {
           </Link>
         </Box>
 
-        <Button onClick={goToUpdateBill} sx={{ ml: 'auto' }}>
-          <EditAttributesIcon />
-        </Button>
-
         <Button onClick={goToPaymentsBill} sx={{ ml: 'auto' }}>
           Payments
         </Button>
 
         <Box sx={{ mx: 2 }}>{renderLoaderButton()}</Box>
+
+        <Button onClick={goToUpdateBill}>
+          <EditIcon />
+        </Button>
 
         {props.isLoading ? (
           <CircularProgress size={20} />
