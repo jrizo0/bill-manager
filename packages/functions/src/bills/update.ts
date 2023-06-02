@@ -11,8 +11,9 @@ export const main = handler(async (event, session) => {
     paymentWeb: Joi.string().optional(),
     expirationDay: Joi.number().optional(),
     reference: Joi.string().optional(),
-    //TODO: Delete in prod (can't update lastPayment)
-    lastPayment: Joi.string().optional(),
+    lastPayment: Joi.any().optional(),
+    index: Joi.any().optional(),
+    created: Joi.string().optional(),
   })
 
   const data = schema.validate(JSON.parse(event.body || ''))
