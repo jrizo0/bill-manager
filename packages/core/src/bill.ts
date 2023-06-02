@@ -1,164 +1,128 @@
-import { Table } from 'sst/node/table'
-import * as uuid from 'uuid'
-import dynamodb from './dynamodb'
+import {
+  BillManager,
+  CreateBillItem,
+  BillItem,
+  BillQueryResponse,
+} from './entities'
+import { Group } from './group'
 import { Payment } from './payment'
 
 export * as Bill from './bill'
 
-export interface Info {
-  userID: string
+export async function create(item: CreateBillItem): Promise<BillItem> {
+  return BillManager.entities.bill
+    .create(item)
+    .go()
+    .then((item) => item.data!)
+    .catch((reason) => {
+      throw new Error(reason)
+    })
+}
+
+export async function get(input: {
   billID: string
-  tag: string
-  paymentWeb: string
-  expirationDay: number
-  reference: string
-  times: {
-    created: Date
-    deleted?: Date
-  }
+  groupID: string
+}): Promise<BillItem> {
+  return BillManager.entities.bill
+    .get({
+      billID: input.billID,
+      groupID: input.groupID,
+    })
+    .go()
+    .then((item) => item.data!)
+    .catch((reason) => {
+      throw new Error(reason)
+    })
 }
 
-export async function create(_input: {
-  userID: string
-  tag: string
-  paymentWeb: string
-  expirationDay: number
-  reference: string
-}) {
-  const params = {
-    TableName: Table.Bills.tableName,
-    Item: {
-      userID: _input.userID,
-      billID: uuid.v1(),
-      tag: _input.tag,
-      paymentWeb: _input.paymentWeb,
-      expirationDay: _input.expirationDay,
-      reference: _input.reference,
-      created: new Date().toISOString(),
-    },
-  }
-  await dynamodb.put(params)
-  return params.Item
+export async function listByGroup(groupID: string): Promise<BillQueryResponse> {
+  return BillManager.entities.bill.query
+    .group({
+      groupID: groupID,
+    })
+    .go()
+    .then((items) => items)
+    .catch((reason) => {
+      throw new Error(reason)
+    })
 }
 
-export async function get(_input: { userID: string; billID: string }) {
-  const params = {
-    TableName: Table.Bills.tableName,
-    Key: {
-      userID: _input.userID,
-      billID: _input.billID,
-    },
-  }
-  const result = await dynamodb.get(params)
+export async function listAllUser(userID: string) {
+  const groupsOfUser = await Group.listGroupsOfUser({ userID: userID })
 
-  return result.Item
-}
+  let response = []
 
-export async function list(_input: { userID: string }) {
-  const params = {
-    TableName: Table.Bills.tableName,
-    KeyConditionExpression: 'userID = :userID',
-    ExpressionAttributeValues: {
-      ':userID': _input.userID,
-    },
-  }
-  const result = await dynamodb.query(params)
-  const bills = result.Items
-
-  for (let bill of bills!) {
-    bill.paid = await isUpToDate({
-      userID: _input.userID,
-      billID: bill.billID,
+  for (const group of groupsOfUser.data) {
+    const bills = await listByGroup(group.groupID)
+    response.push({
+      groupID: group.groupID,
+      groupName: group.name,
+      bills: bills,
     })
   }
 
-  return bills
+  return response
 }
 
-export async function isUpToDate(_input: { userID: string; billID: string }) {
-  const currentMonth = new Date().getMonth()
-  const paymentCurrentMonthQuery = await Payment.get({
-    billID: _input.billID,
-    month: currentMonth,
-  })
-
-  return !!paymentCurrentMonthQuery && true // !!null = false, false & true
+export async function getById(billID: string) {
+  return BillManager.entities.bill.query
+    .billLookup({
+      billID: billID,
+    })
+    .go()
+    .then((value) => value.data.at(0))
 }
 
-export async function remove(_input: { userID: string; billID: string }) {
-  const params = {
-    TableName: Table.Bills.tableName,
-    Key: {
-      userID: _input.userID,
-      billID: _input.billID,
-    },
+export async function remove(input: { groupID: string; billID: string }) {
+  try {
+    const payments = await Payment.list(input)
+    const paymentsIDs: { billID: string; paymentID: string }[] =
+      payments.data!.payment.map((val) => {
+        return { paymentID: val.paymentID, billID: val.billID }
+      })
+
+    await BillManager.entities.payment
+      .delete(paymentsIDs)
+      .go({ concurrency: 1 })
+
+    await BillManager.entities.bill
+      .remove({
+        billID: input.billID,
+        groupID: input.groupID,
+      })
+      .go()
+    return 'Bill deleted'
+  } catch (error) {
+    throw new Error('Bill could not be deleted')
   }
-
-  await dynamodb.delete(params)
-
-  return { status: true }
 }
 
-// TODO: Test this function
-export async function update(_input: {
-  userID: string
+export async function update(input: {
+  groupID: string
   billID: string
-  tag: string | undefined
-  paymentWeb: string | undefined
-  expirationDay: number | undefined
-  reference: string | undefined
+  tag?: string
+  paymentWeb?: string
+  expirationDay?: number
+  reference?: string
+  lastPayment?: string
 }) {
-  let UpdateExpression = 'SET '
-  if (_input.tag) UpdateExpression += 'tag = :tag '
-  if (_input.paymentWeb) UpdateExpression += 'paymentWeb = :paymentWeb '
-  if (_input.expirationDay)
-    UpdateExpression += 'expirationDay = :expirationDay '
-  if (_input.reference) UpdateExpression += 'reference = :reference '
+  const newProperties = Object.fromEntries(
+    Object.entries(input).filter(
+      ([key, val]) =>
+        val !== undefined && !['groupID', 'billID', 'lastPayment'].includes(key)
+    )
+  )
+  if (Object.keys(newProperties).length === 0) return 'No info provided'
 
-  const params = {
-    TableName: Table.Bills.tableName,
-    Key: {
-      userId: _input.userID,
-      billId: _input.billID,
-    },
-    UpdateExpression: UpdateExpression,
-    ExpressionAttributeValues: {
-      ':tag': _input.tag || undefined,
-      ':paymentWeb': _input.paymentWeb || undefined,
-      ':expirationDay': _input.expirationDay || undefined,
-      ':reference': _input.reference || undefined,
-    },
-    ReturnValues: 'ALL_NEW',
-  }
-
-  return await dynamodb.put(params)
+  return BillManager.entities.bill
+    .patch({
+      billID: input.billID,
+      groupID: input.groupID,
+    })
+    .set(newProperties)
+    .go()
+    .then((_item) => 'Bill updated')
+    .catch((_err) => {
+      throw new Error('Bill could not be updated ' + _err)
+    })
 }
-
-/*
-export function updateTag(_input: {
-billID: string,
-tag: string
-}) {
-const params = {
-  TableName: Table.Bills.tableName,
-  // 'Key' defines the partition key and sort key of the item to be updated
-  Key: {
-    // userId: event.requestContext.authorizer.iam.cognitoIdentity.identityId, // The id of the author
-    userId: "1",
-    billId: _input.billID
-  },
-  // 'UpdateExpression' defines the attributes to be updated
-  // 'ExpressionAttributeValues' defines the value in the update expression
-  UpdateExpression: "SET tag = :tag, paymentWeb = :paymentWeb, paymentDay = :paymentDay, reference = :reference",
-  ExpressionAttributeValues: {
-    ":tag": data.tag || null,
-    ":paymentWeb": data.paymentWeb || null,
-    ":paymentDay": data.paymentDay || null,
-    ":reference": data.reference || null,
-  },
-  // 'ReturnValues' specifies if and how to return the item's attributes,
-  // where ALL_NEW returns all attributes of the item after the update; you
-  // can inspect 'result' below to see how it works with different settings
-  ReturnValues: "ALL_NEW",
-}
-*/

@@ -28,14 +28,18 @@ export const handler = AuthHandler({
   async onAuthorize() {},
 
   async onSuccess(input) {
+    let user = undefined
+
     if (input.provider === 'google') {
       const claims = input.tokenset.claims()
+
       const params = {
         email: claims.email ?? onError(),
         userID: claims.sub,
         name: claims.name ?? onError(),
       }
-      const user = await User.create(params)
+      user = await User.login(params)
+
       return {
         type: 'user',
         properties: {

@@ -1,39 +1,111 @@
-import { Table } from 'sst/node/table'
-import dynamodb from './dynamodb'
+import { BillManager } from './entities'
 
 export * as User from './user'
 
-export interface Info {
-  email: string
+export async function login(input: {
   userID: string
   name: string
-}
-
-export async function create(_input: {
-  userID: string
   email: string
-  name: string
 }) {
-  const params = {
-    TableName: Table.Users.tableName,
-    Item: {
-      userID: _input.userID,
-      email: _input.email,
-      name: _input.name,
-    },
+  try {
+    let user = await get({ userID: input.userID })
+
+    if (user) return user
+
+    return await create(input)
+  } catch (error) {
+    throw new Error('login failed')
   }
-  await dynamodb.put(params)
-  return params.Item
 }
 
-export async function get(_input: { userID: string }) {
-  const params = {
-    TableName: Table.Users.tableName,
-    Key: {
-      userID: _input.userID,
-    },
-  }
-  const result = await dynamodb.get(params)
+export async function create(input: {
+  userID: string
+  name: string
+  email: string
+}) {
+  await BillManager.transaction
+    .write(({ user, group, membership }) => [
+      user
+        .create({
+          userID: input.userID,
+          name: input.name,
+          email: input.email,
+        })
+        .commit(),
+      group
+        .create({
+          name: input.userID,
+          groupID: input.userID,
+        })
+        .commit(),
+      membership
+        .create({
+          userID: input.userID,
+          groupID: input.userID,
+        })
+        .commit(),
+    ])
+    .go()
+    .then((val) => val.data)
+    .catch((reason) => {
+      throw new Error(reason)
+    })
+  return input
+}
 
-  return result.Item
+export async function get(input: { userID: string }) {
+  return BillManager.entities.user
+    .get({
+      userID: input.userID,
+    })
+    .go()
+    .then((value) => value.data!)
+}
+
+export async function queryByEmail(input: { email: string }) {
+  return BillManager.entities.user.query
+    .email({
+      email: input.email,
+    })
+    .go()
+    .then((value) => value.data!.at(0))
+}
+
+export async function remove(input: { userID: string }) {
+  return BillManager.entities.user
+    .delete({
+      userID: input.userID,
+    })
+    .go()
+}
+
+export async function listUsersForGroup(input: { groupID: string }) {
+  const data = await BillManager.collections
+    .members({
+      groupID: input.groupID,
+    })
+    .go({ order: 'desc' })
+
+  const usersIDs = data.data!.membership.map((val) => {
+    return { userID: val.userID }
+  })
+
+  return BillManager.entities.user.get(usersIDs).go({ concurrency: 1 })
+}
+
+export async function userCanAccessGroup(input: {
+  groupID: string
+  userID: string
+}) {
+  if (input.userID === input.groupID) return
+
+  const usersForGroup = await listUsersForGroup(input)
+
+  const inGroup = usersForGroup.data.find(
+    (user) => user.userID === input.userID
+  )
+
+  if (!inGroup) {
+    throw new Error("You can't access this group")
+  }
 }

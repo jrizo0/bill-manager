@@ -1,11 +1,18 @@
-import AWS from "aws-sdk";
+import DynamoDB from 'aws-sdk/clients/dynamodb'
+import { DocumentClient } from 'aws-sdk/lib/dynamodb/document_client'
+import { Table } from 'sst/node/table'
 
-const client = new AWS.DynamoDB.DocumentClient();
+export * as Dynamo from './dynamodb'
 
-export default {
-  get: (params: any) => client.get(params).promise(),
-  put: (params: any) => client.put(params).promise(),
-  query: (params: any) => client.query(params).promise(),
-  update: (params: any) => client.update(params).promise(),
-  delete: (params: any) => client.delete(params).promise(),
-};
+let client: DocumentClient | null = null
+
+export const getClient = (): DocumentClient => {
+    if (client) return client
+    client = new DynamoDB.DocumentClient()
+    return client
+}
+
+export const service = {
+  table: Table.table.tableName,
+  client: getClient(),
+}

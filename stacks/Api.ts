@@ -1,29 +1,43 @@
 import { StackContext, Api as ApiGateway, use } from 'sst/constructs'
 import { Database } from './Database'
 import { Authentication } from './Authentication'
+import { Storage } from './Storage'
 
 export function Api({ stack }: StackContext) {
-  const { tableUsers, tableBills, tablePayments } = use(Database)
+  const { table } = use(Database)
   const { auth } = use(Authentication)
+  const { bucket } = use(Storage)
 
   const api = new ApiGateway(stack, 'Api', {
     defaults: {
       function: {
-        bind: [tableUsers, tableBills, tablePayments, auth],
+        bind: [auth, table, bucket],
       },
     },
     routes: {
-      'GET /bills': 'packages/functions/src/bills/list.main',
-      'GET /bills/{id}': 'packages/functions/src/bills/get.main',
-      'POST /bills': 'packages/functions/src/bills/create.main',
-      'DELETE /bills/{id}': 'packages/functions/src/bills/delete.main',
-      'PUT /bills': 'packages/functions/src/bills/update.main',
+      'POST     /groups':                     'packages/functions/src/groups/create.main',
+      'GET      /groups/{id}':                'packages/functions/src/groups/get.main',
+      'GET      /groups/user':                'packages/functions/src/groups/list.main', // groups for user
+      'PUT      /groups':                     'packages/functions/src/groups/update.main',
+      'DELETE   /groups':                     'packages/functions/src/groups/delete.main',
+      'POST     /groups/user':                'packages/functions/src/groups/addUser.main',
+      'DELETE   /groups/user':                'packages/functions/src/groups/deleteUser.main',
+      'GET      /groups/{id}/users':          'packages/functions/src/groups/listUsers.main', // users for group
 
-      'GET /payments/{id}': 'packages/functions/src/payments/list.main',
-      'GET /payments/{id}/{month}': 'packages/functions/src/payments/get.main',
-      'POST /payments/{id}': 'packages/functions/src/payments/create.main',
-      'DELETE /payments': 'packages/functions/src/payments/delete.main',
+      'POST     /bills':                      'packages/functions/src/bills/create.main',
+      'GET      /bills/{id}':                 'packages/functions/src/bills/get.main',
+      'GET      /bills/group/{id}':           'packages/functions/src/bills/list.main',
+      'GET      /bills/all':                  'packages/functions/src/bills/listAll.main',
+      'PUT      /bills':                      'packages/functions/src/bills/update.main',
+      'DELETE   /bills':                      'packages/functions/src/bills/delete.main',
+
+      'POST     /payments':                   'packages/functions/src/payments/create.main',
+      'GET      /payments/{id}':              'packages/functions/src/payments/list.main',
+      'GET      /payments/{bill}/{pay}':      'packages/functions/src/payments/get.main', // with attachment presigned URL
       // update?
+      'DELETE   /payments':                   'packages/functions/src/payments/delete.main',
+
+      'GET      /user':                       'packages/functions/src/users/get.main',
     },
   })
 

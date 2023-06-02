@@ -1,4 +1,4 @@
-import LoadingButton from '@mui/lab/LoadingButton'
+import { Bill } from '@/types/bill'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -6,49 +6,63 @@ import Link from '@mui/material/Link'
 import ListItem from '@mui/material/ListItem'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { bill } from '@/types/bill'
+import { useRouter } from 'next/router'
+import PayButton from './BillPayButton'
 import DeleteButton from './DeleteButton'
+import EditIcon from '@mui/icons-material/Edit'
 
-type BillProps = {
-  bill: bill
-  onPayBill: (billID: string) => void
-  onDeleteBill: (billID: string) => void
+type props = {
+  billID: string
+  groupID: string
+  bill: Bill.item
+  paid: boolean
   isLoading: boolean
+
+  onPayBill: (input: {
+    bill: Bill.item
+    groupID: string
+    file: File | null
+    ammount?: number
+  }) => Promise<any>
+  onDeleteBill: (input: { billID: string; groupID: string }) => void
 }
 
-const Bill = ({ bill, onPayBill, onDeleteBill, isLoading }: BillProps) => {
+const BillListItem = (props: props) => {
+  const router = useRouter()
+
   const renderLoaderButton = () => {
-    return bill.paid ? (
+    return props.paid ? (
       <span className='billPaid'>Pagada</span>
     ) : (
-      <LoadingButton
-        loading={isLoading}
-        variant='contained'
-        disabled={isLoading}
-        onClick={() => onPayBill(bill.billID)}
-      >
-        Pay bill
-      </LoadingButton>
+      <PayButton {...props} />
     )
   }
 
   const renderExpiration = () => {
-    const daysLeft = bill.expirationDay - new Date().getDate()
+    const daysLeft = props.bill.expirationDay - new Date().getDate()
     return (
-      !bill.paid &&
+      !props.paid &&
       (daysLeft > 0 ? (
         <Typography variant='body1' sx={{ fontWeight: 'regular', mx: 2 }}>
-          Expires in {daysLeft} days
+          Expires in {daysLeft} days (day {props.bill.expirationDay})
         </Typography>
       ) : (
         <Typography
           variant='body1'
           sx={{ fontWeight: 'bold', mx: 2, color: '#FF0000' }}
         >
-          Expired {-daysLeft} days ago
+          {daysLeft === 0 ? 'Expires today' : `Expired ${-daysLeft} days ago`}
         </Typography>
       ))
     )
+  }
+
+  const goToPaymentsBill = () => {
+    router.push(`/payments/${props.bill.billID}`)
+  }
+
+  const goToUpdateBill = () => {
+    router.push(`/bills/${props.bill.billID}/update`)
   }
 
   return (
@@ -61,17 +75,6 @@ const Bill = ({ bill, onPayBill, onDeleteBill, isLoading }: BillProps) => {
           alignItems: 'center',
         }}
         divider={true}
-        secondaryAction={
-          isLoading ? (
-            <CircularProgress size={20} />
-          ) : (
-            <DeleteButton
-              onConfirm={() => {
-                onDeleteBill(bill.billID)
-              }}
-            />
-          )
-        }
       >
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Box
@@ -83,18 +86,18 @@ const Bill = ({ bill, onPayBill, onDeleteBill, isLoading }: BillProps) => {
             }}
           >
             <Typography variant='body1' sx={{ fontWeight: 'bold', ml: 2 }}>
-              {bill.tag.trim().split('\n').slice(0, 3)}:
+              {props.bill.tag.trim().split('\n').slice(0, 3)}:
             </Typography>
             <Tooltip title='Copy'>
               <Button
                 variant='text'
                 onClick={() => {
-                  navigator.clipboard.writeText(bill.reference)
+                  navigator.clipboard.writeText(props.bill.reference)
                 }}
                 size='large'
                 sx={{ color: '#000000', textTransform: 'none' }}
               >
-                {bill.reference}
+                {props.bill.reference}
               </Button>
             </Tooltip>
 
@@ -102,19 +105,41 @@ const Bill = ({ bill, onPayBill, onDeleteBill, isLoading }: BillProps) => {
           </Box>
 
           <Link
-            href={bill.paymentWeb}
+            href={props.bill.paymentWeb}
             target='_blank'
             rel='noopener noreferrer'
             sx={{ mx: 2, pb: 1, fontWeight: 'regular' }}
           >
-            {new URL(bill.paymentWeb).host}
+            {new URL(props.bill.paymentWeb).host}
           </Link>
         </Box>
 
+        <Button onClick={goToPaymentsBill} sx={{ ml: 'auto' }}>
+          Payments
+        </Button>
+
         <Box sx={{ mx: 2 }}>{renderLoaderButton()}</Box>
+
+        <Button onClick={goToUpdateBill}>
+          <EditIcon />
+        </Button>
+
+        {props.isLoading ? (
+          <CircularProgress size={20} />
+        ) : (
+          <DeleteButton
+            confirmMsg='Are you sure you want to delete the bill?'
+            onConfirm={() => {
+              props.onDeleteBill({
+                groupID: props.groupID,
+                billID: props.bill.billID,
+              })
+            }}
+          />
+        )}
       </ListItem>
     </>
   )
 }
 
-export default Bill
+export default BillListItem
