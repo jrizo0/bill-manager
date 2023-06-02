@@ -63,7 +63,10 @@ export default function ButtonAppBar() {
       <AppBar position='static' color='transparent'>
         <Toolbar>
           <AccountBalanceWalletIcon
-            sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}
+            sx={{ display: { md: 'flex' }, mr: 1 }}
+            onClick={() => {
+              router.push('/')
+            }}
           />
           <Typography
             variant='h6'
