@@ -108,7 +108,8 @@ export async function update(input: {
 }) {
   const newProperties = Object.fromEntries(
     Object.entries(input).filter(
-      ([key, val]) => val !== undefined && !['groupID', 'billID'].includes(key)
+      ([key, val]) =>
+        val !== undefined && !['groupID', 'billID', 'lastPayment'].includes(key)
     )
   )
   if (Object.keys(newProperties).length === 0) return 'No info provided'
