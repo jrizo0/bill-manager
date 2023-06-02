@@ -1,4 +1,3 @@
-//TODO:
 import { headerAuthToken } from '@/lib/awsLib'
 import { onError } from '@/lib/errorLib'
 import { billsByGroup } from '@/logic/billsByGroups'
@@ -11,7 +10,7 @@ import FormControl from '@mui/material/FormControl'
 import TextField from '@mui/material/TextField'
 import { API } from 'aws-amplify'
 import { useRouter } from 'next/router'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 export default function NewBill() {
@@ -38,9 +37,23 @@ export default function NewBill() {
     getBillInfoById(billID)
   )
 
-  // useEffect(() => {
-  //   setIsLoading(false)
-  // }, [])
+  useEffect(() => {
+    const getBillInfo = async () => {
+      if (bill || !billID) return
+      try {
+        const data: Bill.item = await API.get(
+          'bills',
+          `/bills/${billID}`,
+          headerAuthToken(authToken)
+        )
+        setBill(data)
+      } catch (e) {
+        onError(e)
+      }
+    }
+    getBillInfo()
+    setIsLoading(false)
+  }, [authToken, bill, billID])
 
   function validateForm() {
     if (!bill) return
@@ -75,7 +88,7 @@ export default function NewBill() {
     return (
       <>
         <Typography variant='h5' component='div' sx={{ mt: 4, mx: 2, mb: 2 }}>
-          {bill && `Update bill: ${bill.tag}`}
+          Update your bill
         </Typography>
         <Stack
           direction='column'
