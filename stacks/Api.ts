@@ -20,12 +20,13 @@ export function Api({ stack }: StackContext) {
       'GET      /groups/user':                'packages/functions/src/groups/list.main', // groups for user
       'PUT      /groups':                     'packages/functions/src/groups/update.main',
       'DELETE   /groups':                     'packages/functions/src/groups/delete.main',
-      'POST     /groups/user':                 'packages/functions/src/groups/addUser.main',
+      'POST     /groups/user':                'packages/functions/src/groups/addUser.main',
       'DELETE   /groups/user':                'packages/functions/src/groups/deleteUser.main',
       'GET      /groups/{id}/users':          'packages/functions/src/groups/listUsers.main', // users for group
 
       'POST     /bills':                      'packages/functions/src/bills/create.main',
-      'GET      /bills/{id}':                 'packages/functions/src/bills/list.main',
+      'GET      /bills/{id}':                 'packages/functions/src/bills/get.main',
+      'GET      /bills/group/{id}':           'packages/functions/src/bills/list.main',
       'GET      /bills/all':                  'packages/functions/src/bills/listAll.main',
       'PUT      /bills':                      'packages/functions/src/bills/update.main',
       'DELETE   /bills':                      'packages/functions/src/bills/delete.main',
