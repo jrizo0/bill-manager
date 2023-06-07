@@ -149,7 +149,7 @@ export default function Payments() {
         return {
           id: pay.paymentID,
           created: formatDate(new Date(pay.created)),
-          month: pay.month,
+          month: pay.month + 1,
           year: pay.year,
           attachment: formatFilename(pay.attachment || 'None'),
           ammount: pay.ammount,
