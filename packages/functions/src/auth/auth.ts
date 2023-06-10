@@ -25,9 +25,9 @@ export const handler = AuthHandler({
     }),
   },
 
-  async onAuthorize() {},
+  async onAuthorize() { },
 
-  async onSuccess(input) {
+  async onSuccess(input, response) {
     let user = undefined
 
     if (input.provider === 'google') {
@@ -40,12 +40,12 @@ export const handler = AuthHandler({
       }
       user = await User.login(params)
 
-      return {
+      return response.session({
         type: 'user',
         properties: {
           userID: user.userID,
         },
-      }
+      })
     }
 
     throw new Error('Unknown provider')
