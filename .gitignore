@@ -10,6 +10,7 @@ node_modules
 
 # local env files
 .env*.local
+.env
 
 # next build folder
 /packages/web/.next/
