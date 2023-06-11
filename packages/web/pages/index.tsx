@@ -27,6 +27,7 @@ import { useEffect, useState } from 'react'
 import { BsPencilSquare } from 'react-icons/bs'
 import { useDispatch, useSelector } from 'react-redux'
 import { onError } from '../lib/errorLib'
+import dayjs from 'dayjs'
 
 const Home: NextPage<any> = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -141,19 +142,12 @@ const Home: NextPage<any> = () => {
     )
   }
 
-  function isPaid(lastPayment: string, expirationDay: number) {
-    const dateLastPay = new Date(lastPayment)
-    const dateExpiration = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      expirationDay
-    )
-    if(dateLastPay.getFullYear() > dateExpiration.getFullYear())
-      return true
-    if(dateLastPay.getMonth() >= dateExpiration.getMonth())
-      return true
-    else
-      return false
+  function isPaid(pay: string) {
+    if (dayjs(pay).year() > dayjs().year()) return true
+    else if (dayjs(pay).year() < dayjs().year()) return false
+
+    if (dayjs(pay).month() >= dayjs().month()) return true
+    else return false
   }
 
   function renderBillsList(input: { bills: Bill.item[]; groupID: string }) {
@@ -176,7 +170,7 @@ const Home: NextPage<any> = () => {
                 key={bill.billID}
                 billID={bill.billID}
                 groupID={input.groupID}
-                paid={isPaid(bill.lastPayment, bill.expirationDay)}
+                paid={isPaid(bill.lastPayment)}
                 bill={bill}
                 isLoading={isLoading}
                 onPayBill={handlePayBill}
