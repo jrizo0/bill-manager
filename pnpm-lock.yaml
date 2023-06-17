@@ -417,7 +417,7 @@ packages:
       aws-cdk-lib: 2.79.1
       constructs: ^10.0.0
     dependencies:
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.79.1-alpha.0(aws-cdk-lib@2.79.1)(constructs@10.1.156)
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.79.1-alpha.0(aws-cdk-lib@2.72.1)(constructs@10.1.156)
       aws-cdk-lib: 2.79.1(constructs@10.1.156)
       constructs: 10.1.156
     dev: true
@@ -430,7 +430,7 @@ packages:
       aws-cdk-lib: 2.79.1
       constructs: ^10.0.0
     dependencies:
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.79.1-alpha.0(aws-cdk-lib@2.79.1)(constructs@10.1.156)
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.79.1-alpha.0(aws-cdk-lib@2.72.1)(constructs@10.1.156)
       aws-cdk-lib: 2.79.1(constructs@10.1.156)
       constructs: 10.1.156
     dev: true
