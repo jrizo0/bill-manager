@@ -31,7 +31,6 @@ jobs:
         run: |
           touch .env
           echo GOOGLE_CLIENT_ID=${{ secrets.TEST }} >> .env
-          cat .env
 
       - name: Starting Project
         run: npm install
