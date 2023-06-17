@@ -27,6 +27,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_DEFAULT_REGION }}
 
+      - name: Configure envs
+        run: |
+          touch .env
+          echo GOOGLE_CLIENT_ID=${{ secrets.TEST }} >> .env
+          cat .env
+
       - name: Starting Project
         run: npm install
 
