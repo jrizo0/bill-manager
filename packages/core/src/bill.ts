@@ -9,6 +9,32 @@ import { Payment } from './payment'
 
 export * as Bill from './bill'
 
+function isPaid(lastPayment: string, expirationDay: number, today: Date) {
+  const dateLastPay = new Date(lastPayment)
+  const dateExpiration = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    expirationDay
+  )
+  if (dateLastPay.getFullYear() > dateExpiration.getFullYear()) return true
+  if (dateLastPay.getMonth() >= dateExpiration.getMonth()) return true
+  else return false
+}
+
+export async function getUnpaidOnes() {
+  const today = new Date()
+  return BillManager.entities.bill.scan
+    .where(
+      ({ lastPayment, expirationDay }, { eq }) =>
+        `${eq(isPaid(lastPayment, expirationDay, today), true)}`
+    )
+    .go()
+    .then((items) => items)
+    .catch((reason) => {
+      throw new Error(reason)
+    })
+}
+
 export async function create(item: CreateBillItem): Promise<BillItem> {
   return BillManager.entities.bill
     .create(item)
@@ -76,10 +102,12 @@ export async function getById(billID: string) {
 export async function remove(input: { groupID: string; billID: string }) {
   try {
     const payments = await Payment.list(input)
-    const paymentsIDs: { billID: string; paymentID: string }[] =
-      payments.data!.payment.map((val) => {
-        return { paymentID: val.paymentID, billID: val.billID }
-      })
+    const paymentsIDs: {
+      billID: string
+      paymentID: string
+    }[] = payments.data!.payment.map((val) => {
+      return { paymentID: val.paymentID, billID: val.billID }
+    })
 
     await BillManager.entities.payment
       .delete(paymentsIDs)
