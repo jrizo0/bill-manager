@@ -9,6 +9,24 @@ import { Payment } from './payment'
 
 export * as Bill from './bill'
 
+export async function getUnpaidOnes() {
+  const today = new Date()
+  const prevMonthDate = new Date().setDate(0) // Get the last day of prev month
+  BillManager.entities.bill.query.billLookup
+  return BillManager.entities.bill.scan
+    .where(({ expirationDay }, { eq }) => {
+      return `${eq(expirationDay, today.getDate() + 1)}` // expires in one day
+    })
+    .where(({ lastPayment }, { lt }) => {
+      return `${lt(lastPayment, prevMonthDate.toString())}` // not paid
+    })
+    .go()
+    .then((items) => items)
+    .catch((reason) => {
+      throw new Error(reason)
+    })
+}
+
 export async function create(item: CreateBillItem): Promise<BillItem> {
   return BillManager.entities.bill
     .create(item)
@@ -76,10 +94,12 @@ export async function getById(billID: string) {
 export async function remove(input: { groupID: string; billID: string }) {
   try {
     const payments = await Payment.list(input)
-    const paymentsIDs: { billID: string; paymentID: string }[] =
-      payments.data!.payment.map((val) => {
-        return { paymentID: val.paymentID, billID: val.billID }
-      })
+    const paymentsIDs: {
+      billID: string
+      paymentID: string
+    }[] = payments.data!.payment.map((val) => {
+      return { paymentID: val.paymentID, billID: val.billID }
+    })
 
     await BillManager.entities.payment
       .delete(paymentsIDs)

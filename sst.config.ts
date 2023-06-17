@@ -4,6 +4,7 @@ import { Database } from './stacks/Database'
 import { FrontendStack } from './stacks/Web'
 import { Authentication } from './stacks/Authentication'
 import { Storage } from './stacks/Storage'
+import { Mailing } from './stacks/Mailing'
 
 export default {
   config(_input) {
@@ -22,5 +23,6 @@ export default {
       .stack(Authentication)
       .stack(Api)
       .stack(FrontendStack)
+      .stack(Mailing)
   },
 } satisfies SSTConfig
