@@ -29,8 +29,8 @@ jobs:
 
       - name: Configure envs
         run: |
-          touch .env
-          echo GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} >> .env
+          touch $GITHUB_WORKSPACE/.env
+          echo GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} >> $GITHUB_WORKSPACE/.env
 
       - name: Starting Project
         run: npm install
