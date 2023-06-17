@@ -10,6 +10,7 @@ export function Authentication({ stack }: StackContext) {
     authenticator: {
       handler: 'packages/functions/src/auth/auth.handler',
       bind: [secrets.GOOGLE_CLIENT_ID, table],
+      // bind: [table],
     },
   })
 
