@@ -13,11 +13,15 @@ import * as React from 'react'
 
 interface PayYourBillMailProps {
   userName: string
+  billTag: string
+  url: string
 }
 
 // Template from: https://demo.react.email/preview/koala-welcome?view=source&lang=jsx
 export const PayYourBillMail = ({
-  userName = 'Nombre',
+  userName,
+  billTag,
+  url,
 }: PayYourBillMailProps) => (
   <Html>
     <Head />
@@ -26,14 +30,14 @@ export const PayYourBillMail = ({
       <Container style={container}>
         <Text style={paragraph}>Hola {userName},</Text>
         <Text style={paragraph}>
-          Tu BillManager detectó que pronto esta por vencer una de tus facturas.
+          Tu BillManager detectó que mañana vencerá tu factura: {billTag}.
         </Text>
         <Section style={btnContainer}>
           <Button
             pX={12}
             pY={12}
             style={button}
-            href='https://d2zwmapyy86bzj.cloudfront.net/'
+            href={url}
           >
             Ir a BillManager
           </Button>

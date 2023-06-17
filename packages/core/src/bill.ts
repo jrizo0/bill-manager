@@ -9,25 +9,17 @@ import { Payment } from './payment'
 
 export * as Bill from './bill'
 
-function isPaid(lastPayment: string, expirationDay: number, today: Date) {
-  const dateLastPay = new Date(lastPayment)
-  const dateExpiration = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    expirationDay
-  )
-  if (dateLastPay.getFullYear() > dateExpiration.getFullYear()) return true
-  if (dateLastPay.getMonth() >= dateExpiration.getMonth()) return true
-  else return false
-}
-
 export async function getUnpaidOnes() {
   const today = new Date()
+  const prevMonthDate = new Date().setDate(0) // Get the last day of prev month
+  BillManager.entities.bill.query.billLookup
   return BillManager.entities.bill.scan
-    .where(
-      ({ lastPayment, expirationDay }, { eq }) =>
-        `${eq(isPaid(lastPayment, expirationDay, today), true)}`
-    )
+    .where(({ expirationDay }, { eq }) => {
+      return `${eq(expirationDay, today.getDate() + 1)}` // expires in one day
+    })
+    .where(({ lastPayment }, { lt }) => {
+      return `${lt(lastPayment, prevMonthDate.toString())}` // not paid
+    })
     .go()
     .then((items) => items)
     .catch((reason) => {
