@@ -1,5 +1,6 @@
 import { User } from '@bill-manager/core/user'
 import 'dotenv/config'
+import { Config } from 'sst/node/config'
 import { AuthHandler, GoogleAdapter } from 'sst/node/future/auth'
 
 declare module 'sst/node/future/auth' {
@@ -21,8 +22,7 @@ export const handler = AuthHandler({
   providers: {
     google: GoogleAdapter({
       mode: 'oidc',
-      // clientID: Config.GOOGLE_CLIENT_ID,
-      clientID: process.env.GOOGLE_CLIENT_ID!,
+      clientID: Config.GOOGLE_CLIENT_ID,
     }),
   },
 

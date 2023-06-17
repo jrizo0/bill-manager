@@ -27,11 +27,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_DEFAULT_REGION }}
 
-      - name: Configure envs
-        run: |
-          touch $GITHUB_WORKSPACE/.env
-          echo GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} >> $GITHUB_WORKSPACE/.env
-
       - name: Starting Project
         run: npm install
 
