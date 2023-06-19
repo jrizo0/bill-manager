@@ -15,7 +15,7 @@ export function Mailing({ stack }: StackContext) {
 
   const cron = new Cron(stack, 'Cron', {
     schedule: 'cron(15 10 * * ? *)',
-    // schedule: 'rate(1 minute)',
+    // schedule: 'rate(5 minutes)',
     job: 'packages/functions/src/mailing/sendEventMail.main',
   })
   cron.bind([table, bus])
