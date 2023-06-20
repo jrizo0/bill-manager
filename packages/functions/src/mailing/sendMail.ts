@@ -1,11 +1,11 @@
 import { Mailing } from '@bill-manager/core/mailing'
-import 'dotenv/config'
 import { Resend } from 'resend'
 import { EventHandler } from 'sst/node/event-bus'
 import PayYourBillMail from './mail'
+import { Config } from 'sst/node/config'
 
 export const handler = EventHandler(Mailing.Events.mail, async (evt) => {
-  const resend = new Resend(process.env.RESEND_API_KEY)
+  const resend = new Resend(Config.RESEND_API_KEY)
   try {
     const data = await resend.emails.send({
       from: 'onboarding@resend.dev',
