@@ -12,7 +12,6 @@ export * as Bill from './bill'
 export async function getUnpaidOnes() {
   const today = new Date()
   const prevMonthDate = new Date().setDate(0) // Get the last day of prev month
-  BillManager.entities.bill.query.billLookup
   return BillManager.entities.bill.scan
     .where(({ expirationDay }, { eq }) => {
       return `${eq(expirationDay, today.getDate() + 1)}` // expires in one day
