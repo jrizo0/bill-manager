@@ -1,5 +1,4 @@
 import { User } from '@bill-manager/core/user'
-import 'dotenv/config'
 import { Config } from 'sst/node/config'
 import { AuthHandler, GoogleAdapter } from 'sst/node/future/auth'
 

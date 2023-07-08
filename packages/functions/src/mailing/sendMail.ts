@@ -1,22 +1,37 @@
 import { Mailing } from '@bill-manager/core/mailing'
-import { Resend } from 'resend'
+import { render } from '@react-email/render'
+import SES, { type SendEmailRequest } from 'aws-sdk/clients/ses'
 import { EventHandler } from 'sst/node/event-bus'
 import PayYourBillMail from './mail'
-import { Config } from 'sst/node/config'
 
 export const handler = EventHandler(Mailing.Events.mail, async (evt) => {
-  const resend = new Resend(Config.RESEND_API_KEY)
-  try {
-    const data = await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: evt.properties.email,
-      subject: '¡Revisa tu BillManager!',
-      react: PayYourBillMail({
-        userName: evt.properties.name,
-        billTag: evt.properties.billTag,
-        url: evt.properties.url,
-      }),
+  const ses = new SES({ region: 'us-east-1' })
+
+  const body = render(
+    PayYourBillMail({
+      userName: evt.properties.name,
+      billTag: evt.properties.billTag,
+      url: evt.properties.url,
     })
+  )
+  const params: SendEmailRequest = {
+    Destination: {
+      ToAddresses: [evt.properties.email],
+    },
+    Message: {
+      Body: {
+        Html: {
+          Data: body,
+        },
+      },
+
+      Subject: { Data: '¡Revisa tu BillManager!' },
+    },
+    Source: 'BillManager-Team <jr.rizo.o.jr@gmail.com>',
+  }
+
+  try {
+    const data = await ses.sendEmail(params).promise()
     console.log('Email sended', data)
   } catch (error) {
     console.error(error)
