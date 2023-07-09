@@ -11,7 +11,6 @@ export const Events = {
     name: z.string(),
     email: z.string().email(),
     billTag: z.string(),
-    url: z.string(),
   }),
 }
 
@@ -24,7 +23,5 @@ export async function createSendMailEvent(
     name: name,
     email: email,
     billTag: billTag,
-    // TODO: get it from env
-    url: 'https://d2zwmapyy86bzj.cloudfront.net/'
   })
 }

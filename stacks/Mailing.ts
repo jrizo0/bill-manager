@@ -1,7 +1,9 @@
 import { Config, Cron, EventBus, StackContext, use } from 'sst/constructs'
 import { Database } from './Database'
+import { FrontendStack } from './Web'
 
 export function Mailing({ stack, app }: StackContext) {
+  const { site } = use(FrontendStack)
   const { table } = use(Database)
   const secrets = Config.Secret.create(stack, 'RESEND_API_KEY')
 
@@ -14,6 +16,9 @@ export function Mailing({ stack, app }: StackContext) {
     handler: 'packages/functions/src/mailing/sendMail.handler',
     bind: [secrets.RESEND_API_KEY],
     permissions: ['ses:SendEmail'],
+    environment: {
+      SITE_URL: site.url || 'http://localhost:3000',
+    },
   })
 
   const cron = new Cron(stack, 'Cron', {

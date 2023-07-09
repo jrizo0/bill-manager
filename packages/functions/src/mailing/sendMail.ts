@@ -11,7 +11,7 @@ export const handler = EventHandler(Mailing.Events.mail, async (evt) => {
     PayYourBillMail({
       userName: evt.properties.name,
       billTag: evt.properties.billTag,
-      url: evt.properties.url,
+      url: process.env.SITE_URL || 'http://localhost:3000',
     })
   )
   const params: SendEmailRequest = {
