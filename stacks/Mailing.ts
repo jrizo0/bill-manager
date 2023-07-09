@@ -23,7 +23,7 @@ export function Mailing({ stack, app }: StackContext) {
 
   const cron = new Cron(stack, 'Cron', {
     schedule: ['staging', 'prod'].includes(app.stage)
-      ? 'cron(15 10 * * ? *)' // rule that runs every day at 10:15 UTC + 0 (5:15 AM UTC -5)
+      ? 'cron(0 15 * * ? *)' // rule that runs every day at 15:00 UTC + 0 (10:00 AM UTC -5)
       : 'rate(2 minutes)', // rule that runs every 3 minutes for testing purposes
     job: 'packages/functions/src/mailing/sendEventMail.main',
   })
